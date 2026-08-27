@@ -29,7 +29,7 @@ export const Header = ({ user, onToggleSidebar }: HeaderProps) => {
             <div className="relative items-center flex justify-end h-28 px-6 z-50">
                 <img
                     src={user?.avatarUrl || guestAvatar}
-                    alt={user?.name || "User Avatar"}
+                    alt={"User Avatar"}
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="w-20 h-20 rounded-full cursor-pointer border-2 border-emerald-50 object-cover"
                 />

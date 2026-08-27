@@ -1,8 +1,16 @@
 import { Layout } from '../../components/Layout/Layout';
+import type { User } from '../../types/user';
+
+const currentUser: User = {
+        id: '1',
+        name: 'Ilya Peshkur',
+        role: 'Eblan',
+        avatarUrl: "",
+        };
 
 export const MainPage = () => {
     return (
-        <Layout>
+        <Layout user={currentUser} >
             <div>
                 <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
             </div>

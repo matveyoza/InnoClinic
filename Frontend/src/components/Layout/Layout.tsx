@@ -5,22 +5,16 @@ import type { User } from '../../types/user';
 
 interface LayoutProps {
     children: React.ReactNode;
+    user: User;
 }
 
-export const Layout = ({ children }: LayoutProps) => {
+export const Layout = ({ children, user }: LayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-    const currentUser: User = {
-    id: '1',
-    name: 'Ilya Peshkur',
-    role: 'Eblan',
-    avatarUrl: 'https://i.pinimg.com/736x/33/65/28/3365285c27eb14f02a4e3d881d117a13.jpg',
-  };
 
   return (
     <div className="flex flex-col h-screen bg-emerald-50 overflow-hidden">
         <Header
-            user={currentUser}
+            user={user}
             onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
         

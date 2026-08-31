@@ -7,6 +7,6 @@ import { SignUpPage } from './pages/SignUpPage/SignUpPage';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MainPage />
+    <SignUpPage />
   </StrictMode>,
 );

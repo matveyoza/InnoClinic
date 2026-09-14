@@ -39,25 +39,6 @@ namespace Auth.Controllers
             return StatusCode(201);
         }
 
-        /*[HttpPost("login")]
-        public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
-        {
-            if (!await _authService.ValidateUserAsync(user))
-                return Unauthorized("Invalid email or password.");
-
-            var tokenDto = await _authService.CreateTokenAsync();
-
-            Response.Cookies.Append("jwt", tokenDto.AccessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(60)
-            });
-
-            return Ok();
-        }*/
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {

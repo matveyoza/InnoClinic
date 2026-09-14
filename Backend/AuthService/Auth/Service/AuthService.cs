@@ -16,7 +16,6 @@ namespace Service
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
-        private User? _user;
         public AuthService(
             UserManager<User> userManager,
             IHttpClientFactory httpClientFactory,
@@ -64,25 +63,26 @@ namespace Service
 
         }
 
-        public async Task<bool> ValidateUserAsync(UserForAuthenticationDto userForAuth)
+        public async Task<(bool IsValid, User? user)> ValidateUserAsync(UserForAuthenticationDto userForAuth)
         {
-            _user = await _userManager.FindByEmailAsync(userForAuth.Email);
+            var user = await _userManager.FindByEmailAsync(userForAuth.Email);
 
-            var result = (_user != null && await _userManager.CheckPasswordAsync(_user, userForAuth.Password));
+            if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuth.Password))
+                return (false, null);
 
-            return result;
+            return (true, user);
         }
 
-        public async Task<TokenDto> CreateTokenAsync()
+        public async Task<TokenDto> CreateTokenAsync(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["secretKey"]!;
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, _user!.Id),
-                new Claim(ClaimTypes.Name, _user.UserName ?? _user.Email!),
-                new Claim(ClaimTypes.Email, _user.Email!)
+                new Claim(ClaimTypes.NameIdentifier, user!.Id),
+                new Claim(ClaimTypes.Name, user.UserName ?? user.Email!),
+                new Claim(ClaimTypes.Email, user.Email!)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Service.Shared;
+using Entities.Models;
 
 namespace Service.Contracts
 {
     public interface IAuthService
     {
         Task<IdentityResult> RegisterUserAsync(RegisterDto registerDto);
-        Task<bool> ValidateUserAsync(UserForAuthenticationDto userForAuth);
-        Task<TokenDto> CreateTokenAsync();
+        Task<(bool IsValid, User? user)> ValidateUserAsync(UserForAuthenticationDto userForAuth);
+        Task<TokenDto> CreateTokenAsync(User user);
     }
 }

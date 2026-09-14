@@ -3,8 +3,8 @@ import type { User } from '../../types/user';
 
 const currentUser: User = {
         id: '1',
-        name: 'Ilya Peshkur',
-        role: 'Eblan',
+        userName: 'Ilya Peshkur',
+        email: 'ilya.peshkur@example.com',
         avatarUrl: "",
         };
 

@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Repository;
 using System.Text;
 
-namespace Backend.Extensions
+namespace Auth.Extensions
 {
     public static class ServiceExtensions
     {
@@ -14,27 +14,28 @@ namespace Backend.Extensions
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder =>
-                    builder.WithOrigins("http://localhost:5173")
+                    builder.WithOrigins("http://localhost:5173", "https://localhost:5173")
                     .WithMethods("GET", "POST", "PUT", "DELETE")
                     .AllowAnyHeader()
                     .AllowCredentials());
             });
-
         public static void ConfigureSqlContext(this IServiceCollection services,
            IConfiguration configuration) =>
-           services.AddDbContext<UserDbContext>(opts =>
+           services.AddDbContext<AuthDbContext>(opts =>
            opts.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
             services.AddIdentity<User, IdentityRole>(options =>
             {
-                options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 3;
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 8;
+                options.User.RequireUniqueEmail = true;
             })
-            .AddEntityFrameworkStores<UserDbContext>()
+            .AddEntityFrameworkStores<AuthDbContext>()
             .AddDefaultTokenProviders();
         }
 
@@ -43,11 +44,10 @@ namespace Backend.Extensions
             var jwtSettings = configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["secretKey"];
 
-            services.AddAuthentication(options =>
+            services.AddAuthentication(opt =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
             {
@@ -65,9 +65,9 @@ namespace Backend.Extensions
                 {
                     OnMessageReceived = context =>
                     {
-                        if (context.Request.Cookies.ContainsKey("jwt"))
+                        if (context.Request.Cookies.TryGetValue("AuthToken", out var token))
                         {
-                            context.Token = context.Request.Cookies["jwt"];
+                            context.Token = token;
                         }
                         return Task.CompletedTask;
                     }

@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Service.Shared;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using System.Net;
 
 namespace Auth.Controllers
@@ -36,7 +39,7 @@ namespace Auth.Controllers
             return StatusCode(201);
         }
 
-        [HttpPost("login")]
+        /*[HttpPost("login")]
         public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
         {
             if (!await _authService.ValidateUserAsync(user))
@@ -44,7 +47,60 @@ namespace Auth.Controllers
 
             var tokenDto = await _authService.CreateTokenAsync();
 
-            return Ok(tokenDto);
+            Response.Cookies.Append("jwt", tokenDto.AccessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(60)
+            });
+
+            return Ok();
+        }*/
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var userDto = new UserForAuthenticationDto
+            {
+                Email = request.Email,
+                Password = request.Password
+            };
+            var (isValid, user) = await _authService.ValidateUserAsync(userDto);
+            if (!isValid || user is null)
+                return Unauthorized(new { message = "Invalid credentials" });
+
+            var jwtTokenDto = await _authService.CreateTokenAsync(user);
+
+            Response.Cookies.Append("AuthToken", jwtTokenDto.AccessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddHours(24)
+            });
+
+            return Ok(new { message = "Login successful" });
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public IActionResult GetCurrentUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var userName = User.FindFirstValue(ClaimTypes.Name);
+
+            return Ok(new { id = userId, email, userName });
+        }
+
+        [HttpGet("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("AuthToken");
+            return Ok(new { message = "Logged out successfully" });
         }
     }
 }

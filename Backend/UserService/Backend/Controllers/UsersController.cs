@@ -1,13 +1,13 @@
-﻿using Entities.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
 
 namespace UsersPresentation.Controllers
 {
-    [Route("api/users/internal")]
+    [Route("api/users")]
     [ApiController]
+    [Authorize]
     public class InternalUsersController : ControllerBase
     {
         private readonly IUserService _userService;

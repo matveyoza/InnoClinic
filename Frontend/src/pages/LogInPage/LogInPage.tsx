@@ -1,14 +1,25 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export const LogInPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError('');
 
-        console.log('Logging in with:', { email, password });
+        try {
+            await login({ email, password });
+            navigate('/main');
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'Invalid email or password.');
+        }
     };
 
     return (
@@ -18,6 +29,11 @@ export const LogInPage = () => {
                         <h1 className="text-3xl font-bold text-slate-800">InnoClinic</h1>
                         <h2 className="text-slate-500 text-sm mt-2">Sign In</h2>
                     </div>
+
+                {error && (
+                    <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
+                        {error}
+                    </div>)}
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
@@ -63,7 +79,7 @@ export const LogInPage = () => {
                         </div>
                     </div>
 
-                    <div className="text-emerald-600 font-medium hover: text-sm">
+                    <div className="flex items-center justify-between text-sm">
                         <label className="flex items-center text-slate-600 cursor-pointer">
                             <input
                                 type="checkbox"
@@ -71,7 +87,7 @@ export const LogInPage = () => {
                             />
                             Remember me
                         </label>
-                        <a href="#forgot-password" className="text-emerald-600 font-medium hover:underline text-sm">
+                        <a href="#forgot-password" className="text-emerald-600 font-medium hover:underline">
                             Forgot password?
                         </a>
                     </div>

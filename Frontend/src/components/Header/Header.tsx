@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { User } from '../../types/user';
-import guestAvatar from '../../assets/images/guestAvatar.png';
+import guestAvatar from '../../assets/images/guest.jpg';
 
 export interface HeaderProps {
     user: User;

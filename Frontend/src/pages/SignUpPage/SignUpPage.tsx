@@ -140,9 +140,9 @@ export const SignUpPage = () => {
                 <p className="flex justify-between text-sm text-slate-500 mt-6">
                     
                     Have an account?
-                    <a href="#sign-up" className="text-right text-emerald-600 font-semibold hover:underline">
+                    <span className="text-right text-emerald-600 font-semibold hover:underline">
                         Log In
-                    </a>
+                    </span>
                 </p>
             </div>
         </div>

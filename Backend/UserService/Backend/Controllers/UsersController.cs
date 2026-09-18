@@ -11,9 +11,13 @@ namespace UsersPresentation.Controllers
     public class InternalUsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILogger<InternalUsersController> _logger;
 
-        public InternalUsersController(IUserService userService) =>
+        public InternalUsersController(IUserService userService, ILogger<InternalUsersController> logger)
+        {
             _userService = userService;
+            _logger = logger;
+        }
 
         [HttpGet(Name = "GetUsers")]
         public async Task<IActionResult> GetUsers()
@@ -24,13 +28,24 @@ namespace UsersPresentation.Controllers
         }
 
         [HttpGet("{id}", Name = "UserById")]
-        public async Task<IActionResult> GetUser(string id)
+        public async Task<IActionResult> GetUser(string id, CancellationToken cancellationToken)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-            return Ok(user);
+            try
+            {
+                _logger.LogInformation("Starting to fetch user {Id}...", id);
+
+                var user = await _userService.GetUserByIdAsync(id, cancellationToken);
+                return Ok(user);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("Request for user {Id} was cancelled by the client!", id);
+
+                return StatusCode(499, "Request cancelled");
+            }
         }
 
-        [HttpGet("internal/by-email/{email}")]
+        [HttpGet("by-email/{email}")]
         public async Task<IActionResult> GetUserForAuth(string email)
         {
             var user = await _userService.GetUserForAuthByEmailAsync(email);
@@ -40,13 +55,41 @@ namespace UsersPresentation.Controllers
             return Ok(user);
         }
 
+        [AllowAnonymous]
         [HttpPost("profile")]
         public async Task<IActionResult> CreateUserProfile([FromBody] UserProfileDto profileDto)
         {
             if (profileDto == null || string.IsNullOrEmpty(profileDto.Id))
+            {
+                _logger.LogWarning("Profile creation failed: Payload is null or ID is missing.");
                 return BadRequest("Invalid profile payload.");
+            }
 
             var result = await _userService.CreateUserProfileAsync(profileDto);
+
+            if (!result.Succeeded)
+            {
+                var errorMessages = result.Errors.Select(e => e.Description).ToList();
+
+                _logger.LogWarning("Failed profile creation for ID {Id}. Reasons: {Errors}",
+                    profileDto.Id,
+                    string.Join(", ", errorMessages));
+
+                return BadRequest(new
+                {
+                    message = "User profile creation failed.",
+                    errors = errorMessages
+                });
+            }
+
+            _logger.LogInformation("User profile successfully created for ID: {Id}", profileDto.Id);
+            return StatusCode(201, new { message = "User profile created successfully." });
+        }
+
+        [HttpDelete("profile")]
+        public async Task<IActionResult> DeleteUserAsync([FromBody] string Id)
+        {
+            var result = await _userService.DeleteUserAsync(Id);
 
             if (!result.Succeeded)
             {
@@ -57,7 +100,7 @@ namespace UsersPresentation.Controllers
                 return BadRequest(ModelState);
             }
 
-            return StatusCode(201);
+            return Ok();
         }
     }
 }

@@ -16,24 +16,20 @@ namespace Backend.Extensions
                 options.AddPolicy("CorsPolicy", builder =>
                     builder.WithOrigins("http://localhost:5173")
                     .WithMethods("GET", "POST", "PUT", "DELETE")
-                    .AllowAnyHeader()
+                    .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With")
                     .AllowCredentials());
             });
 
-        public static void ConfigureSqlContext(this IServiceCollection services,
-           IConfiguration configuration) =>
-           services.AddDbContext<UserDbContext>(opts =>
-           opts.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
+        public static void ConfigureSqlContext(this IServiceCollection services)
+        {
+            var connectionString = Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION");
+            services.AddDbContext<UserDbContext>(opts =>
+           opts.UseSqlServer(connectionString));
+        }
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<User, IdentityRole>(options =>
-            {
-                options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 3;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-            })
+            services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<UserDbContext>()
             .AddDefaultTokenProviders();
         }
@@ -41,7 +37,7 @@ namespace Backend.Extensions
         public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["secretKey"];
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
 
             services.AddAuthentication(options =>
             {
@@ -65,9 +61,9 @@ namespace Backend.Extensions
                 {
                     OnMessageReceived = context =>
                     {
-                        if (context.Request.Cookies.ContainsKey("jwt"))
+                        if (context.Request.Cookies.ContainsKey("AuthToken"))
                         {
-                            context.Token = context.Request.Cookies["jwt"];
+                            context.Token = context.Request.Cookies["AuthToken"];
                         }
                         return Task.CompletedTask;
                     }

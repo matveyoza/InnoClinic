@@ -4,15 +4,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Service.Contracts;
 using Service.Shared;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Service
 {
     public class AuthService : IAuthService
     {
+        private const string UserServiceHttpClientName = "UserService";
+        private const string UserProfileEndpoint = "api/users/profile";
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
@@ -60,7 +62,6 @@ namespace Service
             }
 
             return IdentityResult.Success;
-
         }
 
         public async Task<(bool IsValid, User? user)> ValidateUserAsync(UserForAuthenticationDto userForAuth)
@@ -76,7 +77,7 @@ namespace Service
         public async Task<TokenDto> CreateTokenAsync(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["secretKey"]!;
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
 
             var claims = new List<Claim>
             {
@@ -85,7 +86,7 @@ namespace Service
                 new Claim(ClaimTypes.Email, user.Email!)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var tokenOptions = new JwtSecurityToken(
@@ -103,9 +104,9 @@ namespace Service
 
         private async Task<bool> CreateUserProfileAsync(UserProfileCreationDto profileDto)
         {
-            var client = _httpClientFactory.CreateClient("UserService");
+            var client = _httpClientFactory.CreateClient(UserServiceHttpClientName);
 
-            var response = await client.PostAsJsonAsync("api/users/internal/profile", profileDto);
+            var response = await client.PostAsJsonAsync(UserProfileEndpoint, profileDto);
 
             return response.IsSuccessStatusCode;
         }

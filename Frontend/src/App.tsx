@@ -1,21 +1,28 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { LogInPage } from "./pages/LogInPage/LogInPage";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import { loginAction, LogInPage } from "./pages/LogInPage/LogInPage";
 import { MainPage } from "./pages/MainPage/MainPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
+const router = createBrowserRouter([
+    {
+        path: "/login",
+        element: <LogInPage />,
+        action: loginAction,
+    },
+    {
+        element: <ProtectedRoute />,
+        children: [
+            {
+                path: "/main",
+                element: <MainPage />,
+            }
+        ]
+    },
+    {
+        path: "*",
+        element: <Navigate to="/login" />,
+    }
+]);
 export const App = () => {
-    return (
-        <BrowserRouter>
-            <AuthProvider>
-                <Routes>
-                    <Route path="/login" element={<LogInPage />} />
-                    <Route element={<ProtectedRoute />}>
-                        <Route path="/main" element={<MainPage />} />
-                    </Route>
-                    <Route path="*" element={<Navigate to="/login" />} />
-                </Routes>
-            </AuthProvider>    
-        </BrowserRouter>
-    )
-}
+    return <RouterProvider router={router} />; 
+};

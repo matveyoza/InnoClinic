@@ -22,18 +22,14 @@ export const Sidebar =({ isOpen, onClose }: SidebarProps) => {
                 </div>
 
                 <nav className="flex flex-col gap-3">
-                    <a
-                        href="#schedule"
-                        className="text-black no-underline px-3 py-2 rounded-md hover:text-slate-400 transition-colors"
+                    <span className="text-black no-underline px-3 py-2 rounded-md hover:text-slate-400 transition-colors"
                     >
                         📅 Doctor Schedule
-                    </a>
-                    <a
-                        href="#appointments"
-                        className="text-black no-underline px-3 py-2 rounded-md hover:text-slate-400 transition-colors"
+                    </span>
+                    <span className="text-black no-underline px-3 py-2 rounded-md hover:text-slate-400 transition-colors"
                     >
                         📋 Appointments
-                    </a>
+                    </span>
                 </nav>
             </aside>
 

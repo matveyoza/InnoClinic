@@ -26,10 +26,12 @@ namespace Service
             .ToListAsync();
 
 
-        public async Task<UserDto?> GetUserByIdAsync(string id)
+        public async Task<UserDto?> GetUserByIdAsync(string id, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user is null) return null;
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+
+            if (user is null)
+                return null;
 
             return new UserDto
             {
@@ -72,7 +74,6 @@ namespace Service
                 Id = user.Id,
                 Email = user.Email ?? string.Empty,
                 UserName = user.UserName ?? string.Empty,
-                PasswordHash = user.PasswordHash ?? string.Empty
             };
         }
     }

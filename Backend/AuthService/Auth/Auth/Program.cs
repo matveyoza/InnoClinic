@@ -1,10 +1,16 @@
+using AuthPresentation.Extensions;
+using DotNetEnv;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Service;
 using Service.Contracts;
-using Auth.Extensions;
+using Service.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.ConfigureSqlContext(builder.Configuration);
+Env.Load();
+
+builder.Services.ConfigureSqlContext();
 
 builder.Services.ConfigureIdentity();
 
@@ -21,6 +27,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(Auth.Controllers.AuthController).Assembly);
+
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<UserForAuthenticationDtoValidator>();
 
 var app = builder.Build();
 

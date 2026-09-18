@@ -1,26 +1,25 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../store/useAuthStore";
+import { useState } from "react";
+import { login } from "../../services/authService";
+import { Form, useActionData, redirect } from "react-router-dom";
+
+export const loginAction = async ({ request }: any) => {
+    const formData = await request.formData();
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+        await login({ email, password });
+
+        return redirect("/main");
+    } catch (err: any) {
+        return { error: err.response?.data?.message || 'Invalid email or password.' };
+    }
+};
 
 export const LogInPage = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
-    const { login } = useAuthStore();
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setError('');
-
-        try {
-            await login({ email, password });
-            navigate('/main');
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Invalid email or password.');
-        }
-    };
+    const actionData = useActionData();
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -30,12 +29,13 @@ export const LogInPage = () => {
                         <h2 className="text-slate-500 text-sm mt-2">Sign In</h2>
                     </div>
 
-                {error && (
+                {actionData?.error && (
                     <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
-                        {error}
-                    </div>)}
+                        {actionData.error}
+                    </div>
+                )}
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <Form method="post" className="space-y-5">
                     <div>
                         <label
                             htmlFor="email"
@@ -45,9 +45,8 @@ export const LogInPage = () => {
                         </label>
                         <input
                             id="email"
+                            name="email"
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
                             required
                         />
@@ -63,9 +62,8 @@ export const LogInPage = () => {
                         <div className="relative">
                             <input
                                 id="password"
+                                name="password"
                                 type={showPassword ? 'text' : 'password'}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
                                 required
                             />
@@ -87,9 +85,9 @@ export const LogInPage = () => {
                             />
                             Remember me
                         </label>
-                        <a href="#forgot-password" className="text-emerald-600 font-medium hover:underline">
+                        <span className="text-emerald-600 font-medium hover:underline">
                             Forgot password?
-                        </a>
+                        </span>
                     </div>
 
                     <button
@@ -98,14 +96,14 @@ export const LogInPage = () => {
                     >
                         Sign In
                     </button>
-                </form>
+                </Form>
 
                 <p className="flex justify-between text-sm text-slate-500 mt-6">
                     
                     Don't have an account?
-                    <a href="#sign-up" className="text-right text-emerald-600 font-semibold hover:underline">
+                    <span className="text-right text-emerald-600 font-semibold hover:underline">
                         Register
-                    </a>
+                    </span>
                 </p>
             </div>
         </div>

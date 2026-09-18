@@ -4,7 +4,7 @@ using Service.Contracts;
 using Service.Shared;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using System.Net;
+using Entities.Models;
 
 namespace Auth.Controllers
 {
@@ -13,30 +13,41 @@ namespace Auth.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
+        private readonly ILogger<AuthController> _logger;
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
         {
             _authService = authService;
+            _logger = logger;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterDto registerDto)
         {
             if (registerDto is null)
-                return BadRequest("User registration payload is null.");
+            {
+                return BadRequest(ApiResponse<object>.Fail(
+                    new List<string> { "Payload is null." },
+                    "Invalid request."
+                ));
+            }
 
             var result = await _authService.RegisterUserAsync(registerDto);
 
             if (!result.Succeeded)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.Code, error.Description);
-                }
-                return BadRequest(ModelState);
+                var errorMessages = result.Errors.Select(e => e.Description).ToList();
+
+                _logger.LogWarning("Failed registration attempt for email {Email}. Reasons: {Errors}",
+                    registerDto.Email,
+                    string.Join(", ", errorMessages));
+
+                return BadRequest(ApiResponse<object>.Fail(
+                    errorMessages,
+                    "User registation failed."));
             }
 
-            return StatusCode(201);
+            _logger.LogInformation("User successfully registered: {Email}", registerDto.Email);
+            return StatusCode(201, ApiResponse<object?>.Ok(null, "User registered successfully."));
         }
 
         [HttpPost("login")]
@@ -62,18 +73,18 @@ namespace Auth.Controllers
                 Expires = DateTimeOffset.UtcNow.AddHours(24)
             });
 
-            return Ok(new { message = "Login successful" });
-        }
-
-        [HttpGet("me")]
-        [Authorize]
-        public IActionResult GetCurrentUser()
-        {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var email = User.FindFirstValue(ClaimTypes.Email);
             var userName = User.FindFirstValue(ClaimTypes.Name);
 
             return Ok(new { id = userId, email, userName });
+        }
+
+        [HttpGet("check")]
+        [Authorize]
+        public IActionResult AuthCheck()
+        {
+            return Ok();
         }
 
         [HttpGet("logout")]

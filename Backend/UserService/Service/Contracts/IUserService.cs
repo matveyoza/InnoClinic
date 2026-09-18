@@ -7,7 +7,7 @@ namespace Service.Contracts
     public interface IUserService
     {
         Task<IEnumerable<UserDto>> GetUsersAsync();
-        Task<UserDto?> GetUserByIdAsync(string id);
+        Task<UserDto?> GetUserByIdAsync(string id, CancellationToken cancellationToken = default);
         Task<IdentityResult> CreateUserProfileAsync(UserProfileDto profileDto);
         Task<IdentityResult> DeleteUserAsync(string id);
         Task<UserForAuthDto?> GetUserForAuthByEmailAsync(string email);

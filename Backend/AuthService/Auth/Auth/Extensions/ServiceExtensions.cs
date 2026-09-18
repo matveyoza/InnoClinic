@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Repository;
 using System.Text;
 
-namespace Auth.Extensions
+namespace AuthPresentation.Extensions
 {
     public static class ServiceExtensions
     {
@@ -16,13 +16,15 @@ namespace Auth.Extensions
                 options.AddPolicy("CorsPolicy", builder =>
                     builder.WithOrigins("http://localhost:5173", "https://localhost:5173")
                     .WithMethods("GET", "POST", "PUT", "DELETE")
-                    .AllowAnyHeader()
+                    .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With")
                     .AllowCredentials());
             });
-        public static void ConfigureSqlContext(this IServiceCollection services,
-           IConfiguration configuration) =>
-           services.AddDbContext<AuthDbContext>(opts =>
-           opts.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
+        public static void ConfigureSqlContext(this IServiceCollection services)
+        {
+            var connectionString = Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION");
+            services.AddDbContext<AuthDbContext>(opts =>
+            opts.UseSqlServer(connectionString));
+        }
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
@@ -42,7 +44,12 @@ namespace Auth.Extensions
         public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["secretKey"];
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                throw new InvalidOperationException("JWT Secret Key is missing from the environment variables.");
+            }
 
             services.AddAuthentication(opt =>
             {

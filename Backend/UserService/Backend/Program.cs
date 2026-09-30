@@ -9,7 +9,7 @@ Env.Load();
 
 builder.Services.ConfigureIdentity();
 
-builder.Services.ConfigureJwt(builder.Configuration);
+builder.Services.ConfigureJwt();
 
 builder.Services.ConfigureCors(builder.Configuration);
 
@@ -18,6 +18,11 @@ builder.Services.ConfigureSqlContext();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(Program).Assembly);
+});
 
 var app = builder.Build();
 

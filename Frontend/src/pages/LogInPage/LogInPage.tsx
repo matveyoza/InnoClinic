@@ -1,25 +1,40 @@
 import { useState } from "react";
 import { login } from "../../services/authService";
-import { Form, useActionData, redirect } from "react-router-dom";
-
-export const loginAction = async ({ request }: any) => {
-    const formData = await request.formData();
-    const email = formData.get("email");
-    const password = formData.get("password");
-
-    try {
-        await login({ email, password });
-
-        return redirect("/main");
-    } catch (err: any) {
-        return { error: err.response?.data?.message || 'Invalid email or password.' };
-    }
-};
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../store/useAuth";
+import axios from "axios";
 
 export const LogInPage = () => {
-    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+    const setAuth = useAuth(state => state.setAuth);
+    const navigate = useNavigate();
 
-    const actionData = useActionData();
+    const submitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        setError('');
+
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+
+        try {
+            const userData = await login({ email, password });
+            setAuth(userData, true);
+            navigate("/main");
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                // Adjust '.message' based on your actual .NET backend JSON structure!
+                // It might be err.response.data.title or err.response.data.errors
+                setError(err.response?.data?.message || 'Invalid email or password.');
+            } else if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unknown error occurred during login.');
+            }
+        }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -29,13 +44,13 @@ export const LogInPage = () => {
                         <h2 className="text-slate-500 text-sm mt-2">Sign In</h2>
                     </div>
 
-                {actionData?.error && (
+                {error && (
                     <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
-                        {actionData.error}
+                        {error}
                     </div>
                 )}
 
-                <Form method="post" className="space-y-5">
+                <form onSubmit={submitLogin} className="space-y-5">
                     <div>
                         <label
                             htmlFor="email"
@@ -46,6 +61,7 @@ export const LogInPage = () => {
                         <input
                             id="email"
                             name="email"
+                            placeholder=""
                             type="email"
                             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
                             required
@@ -63,6 +79,7 @@ export const LogInPage = () => {
                             <input
                                 id="password"
                                 name="password"
+                                placeholder=""
                                 type={showPassword ? 'text' : 'password'}
                                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
                                 required
@@ -85,9 +102,9 @@ export const LogInPage = () => {
                             />
                             Remember me
                         </label>
-                        <span className="text-emerald-600 font-medium hover:underline">
+                        <Link to="/forgot-password"  className="text-emerald-600 font-medium hover:underline">
                             Forgot password?
-                        </span>
+                        </Link>
                     </div>
 
                     <button
@@ -96,14 +113,14 @@ export const LogInPage = () => {
                     >
                         Sign In
                     </button>
-                </Form>
+                </form>
 
                 <p className="flex justify-between text-sm text-slate-500 mt-6">
                     
                     Don't have an account?
-                    <span className="text-right text-emerald-600 font-semibold hover:underline">
+                    <Link to="/register" className="text-right text-emerald-600 font-semibold hover:underline">
                         Register
-                    </span>
+                    </Link>
                 </p>
             </div>
         </div>

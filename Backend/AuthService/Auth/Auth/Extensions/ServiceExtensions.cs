@@ -5,25 +5,30 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
 using System.Text;
+using Service.Constants;
 
 namespace AuthPresentation.Extensions
 {
     public static class ServiceExtensions
     {
-        public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration) =>
+        public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
+        {
+            var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
+
             services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy", builder =>
-                    builder.WithOrigins("http://localhost:5173", "https://localhost:5173")
+                options.AddPolicy(AppConstants.CorsPolicy, builder =>
+                    builder.WithOrigins(allowedOrigins!)
                     .WithMethods("GET", "POST", "PUT", "DELETE")
                     .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With")
                     .AllowCredentials());
             });
+        }
         public static void ConfigureSqlContext(this IServiceCollection services)
         {
             var connectionString = Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION");
             services.AddDbContext<AuthDbContext>(opts =>
-            opts.UseSqlServer(connectionString));
+                opts.UseSqlServer(connectionString));
         }
 
         public static void ConfigureIdentity(this IServiceCollection services)
@@ -45,6 +50,8 @@ namespace AuthPresentation.Extensions
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
             var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+            var validIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER");
+            var validAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE");
 
             if (string.IsNullOrEmpty(secretKey))
             {
@@ -64,8 +71,8 @@ namespace AuthPresentation.Extensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["validIssuer"],
-                    ValidAudience = jwtSettings["validAudience"],
+                    ValidIssuer = validIssuer,
+                    ValidAudience = validAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
                 };
                 options.Events = new JwtBearerEvents
@@ -76,6 +83,11 @@ namespace AuthPresentation.Extensions
                         {
                             context.Token = token;
                         }
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"\n[JWT ERROR] {context.Exception.Message}\n");
                         return Task.CompletedTask;
                     }
                 };

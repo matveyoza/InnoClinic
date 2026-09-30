@@ -5,10 +5,11 @@ using FluentValidation.AspNetCore;
 using Service;
 using Service.Contracts;
 using Service.Validators;
+using Service.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
+Env.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 
 builder.Services.ConfigureSqlContext();
 
@@ -30,12 +31,17 @@ builder.Services.AddControllers()
 
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddValidatorsFromAssemblyContaining<UserForAuthenticationDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ServiceAssemblyMarker>();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(ServiceAssemblyMarker).Assembly);
+});
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
+app.UseCors(AppConstants.CorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -1,6 +1,8 @@
-﻿using Entities.Models;
+﻿using AutoMapper;
+using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
 
@@ -10,25 +12,33 @@ namespace Service
     {
         private readonly UserManager<User> _userManager;
 
-        public UserService(UserManager<User> userManager) =>
-            _userManager = userManager;
+        private readonly IMapper _mapper;
 
-        public async Task<IEnumerable<UserDto>> GetUsersAsync() =>
-            await _userManager.Users
-            .AsNoTracking()
-            .Select(user => new UserDto
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName ?? string.Empty,
-                Email = user.Email ?? string.Empty
-            })
-            .ToListAsync();
+        private readonly ILogger _logger;
 
-
-        public async Task<UserDto?> GetUserByIdAsync(string id, CancellationToken cancellationToken)
+        public UserService(UserManager<User> userManager, IMapper mapper, ILogger logger)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+            _userManager = userManager;
+            _mapper = mapper;
+            _logger = logger;
+        }
+
+        public async Task<IEnumerable<UserDto>> GetUsersAsync(CancellationToken cancellationToken) =>
+            await _userManager.Users
+                .AsNoTracking()
+                .Select(user => new UserDto
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    UserName = user.UserName ?? string.Empty,
+                    Email = user.Email ?? string.Empty
+                })
+                .ToListAsync(cancellationToken);
+
+
+        public async Task<UserDto?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id.ToString(), cancellationToken);
 
             if (user is null)
                 return null;
@@ -42,39 +52,34 @@ namespace Service
             };
         }
 
-        public async Task<IdentityResult> CreateUserProfileAsync(UserProfileDto profileDto)
+        public async Task<bool> CreateUserProfileAsync(UserProfileDto profileDto)
         {
-            var user = new User
-            {
-                Id = profileDto.Id,
-                Email = profileDto.Email,
-                UserName = profileDto.UserName ?? profileDto.Email,
-                FirstName = profileDto.FirstName,
-                LastName = profileDto.LastName
-            };
+            var user = _mapper.Map<User>(profileDto);
 
-            return await _userManager.CreateAsync(user);
+            var result = await _userManager.CreateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                _logger.LogInformation($"Failed profile creation for ID {user.Id}.");
+                return false;
+            }
+
+            return true;
         }
 
-        public async Task<IdentityResult> DeleteUserAsync(string id)
+        public async Task<bool> DeleteUserAsync(Guid id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return IdentityResult.Failed();
+            var user = await _userManager.FindByIdAsync(id.ToString());
 
-            return await _userManager.DeleteAsync(user);
-        }
+            if (user == null)
+                return false;
 
-        public async Task<UserForAuthDto?> GetUserForAuthByEmailAsync(string email)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user is null) return null;
+            var result = await _userManager.DeleteAsync(user);
 
-            return new UserForAuthDto
-            {
-                Id = user.Id,
-                Email = user.Email ?? string.Empty,
-                UserName = user.UserName ?? string.Empty,
-            };
+            if (!result.Succeeded)
+                return false;
+
+            return true;
         }
     }
 }

@@ -1,26 +1,31 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
-import { loginAction, LogInPage } from "./pages/LogInPage/LogInPage";
+import { LogInPage } from "./pages/LogInPage/LogInPage";
 import { MainPage } from "./pages/MainPage/MainPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { GlobalError } from "./components/GlobalError";
 
 const router = createBrowserRouter([
     {
-        path: "/login",
-        element: <LogInPage />,
-        action: loginAction,
-    },
-    {
-        element: <ProtectedRoute />,
+        errorElement: <GlobalError />, 
         children: [
             {
-                path: "/main",
-                element: <MainPage />,
+                path: "/login",
+                element: <LogInPage />,
+            },
+            {
+                element: <ProtectedRoute />,
+                children: [
+                    {
+                        path: "/main",
+                        element: <MainPage />,
+                    }
+                ]
+            },
+            {
+                path: "*",
+                element: <Navigate to="/login" />,
             }
         ]
-    },
-    {
-        path: "*",
-        element: <Navigate to="/login" />,
     }
 ]);
 export const App = () => {

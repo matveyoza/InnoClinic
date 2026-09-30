@@ -22,22 +22,23 @@ namespace Backend.Extensions
 
         public static void ConfigureSqlContext(this IServiceCollection services)
         {
-            var connectionString = Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION");
+            var connectionString = Environment.GetEnvironmentVariable("USER_DB_CONNECTION");
             services.AddDbContext<UserDbContext>(opts =>
-           opts.UseSqlServer(connectionString));
+                opts.UseSqlServer(connectionString));
         }
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
             services.AddIdentity<User, IdentityRole>()
-            .AddEntityFrameworkStores<UserDbContext>()
-            .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<UserDbContext>()
+                .AddDefaultTokenProviders();
         }
 
-        public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
+        public static void ConfigureJwt(this IServiceCollection services)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
             var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+            var validIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER");
+            var validAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE");
 
             services.AddAuthentication(options =>
             {
@@ -53,8 +54,8 @@ namespace Backend.Extensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["validIssuer"],
-                    ValidAudience = jwtSettings["validAudience"],
+                    ValidIssuer = validIssuer,
+                    ValidAudience = validAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
                 };
                 options.Events = new JwtBearerEvents

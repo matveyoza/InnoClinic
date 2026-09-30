@@ -6,8 +6,8 @@ namespace Service.Contracts
 {
     public interface IAuthService
     {
-        Task<IdentityResult> RegisterUserAsync(RegisterDto registerDto);
-        Task<(bool IsValid, User? user)> ValidateUserAsync(UserForAuthenticationDto userForAuth);
+        Task<bool> RegisterUserAsync(UserForRegistrationDto registerDto);
+        Task<User?> ValidateUserAsync(UserForAuthenticationDto userForAuth);
         Task<TokenDto> CreateTokenAsync(User user);
     }
 }

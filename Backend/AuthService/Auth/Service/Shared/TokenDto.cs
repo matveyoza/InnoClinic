@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Service.Shared
 {
-    public class TokenDto
+    public sealed class TokenDto
     {
         public string AccessToken { get; set; } = string.Empty;
     }

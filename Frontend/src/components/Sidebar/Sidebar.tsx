@@ -1,4 +1,9 @@
-export interface SidebarProps {
+import { Link } from "react-router-dom";
+import { MdClose } from "react-icons/md";
+import { MdCalendarMonth } from "react-icons/md";
+import { MdAssignment } from 'react-icons/md';
+
+interface SidebarProps {
     isOpen: boolean;
     onClose: () => void;
 }
@@ -15,25 +20,23 @@ export const Sidebar =({ isOpen, onClose }: SidebarProps) => {
                     <h3 className="m-0 text-emerald-500 font-bold text-xl">InnoClinic</h3>
                     <button
                         onClick={onClose}
-                        className="bg-transparent border-none text-black text-lg cursor-pointer hover:text-slate-400 transition-colors"
+                        className="flex items-center justify-center bg-transparent border-none text-black text-lg cursor-pointer hover:text-slate-400 transition-colors"
                     >
-                        ✕
+                        <MdClose className="w-6 h-6" />
                     </button>
                 </div>
 
                 <nav className="flex flex-col gap-3">
-                    <a
-                        href="#schedule"
-                        className="text-black no-underline px-3 py-2 rounded-md hover:text-slate-400 transition-colors"
+                    <Link to="/schedule" className="text-black no-underline px-3 py-2 rounded-md hover:text-slate-400 transition-colors"
                     >
-                        📅 Doctor Schedule
-                    </a>
-                    <a
-                        href="#appointments"
-                        className="text-black no-underline px-3 py-2 rounded-md hover:text-slate-400 transition-colors"
+                        <MdCalendarMonth className="w-5 h-5 mr-2" />
+                        Doctor Schedule
+                    </Link>
+                    <Link to="/appointments" className="text-black no-underline px-3 py-2 rounded-md hover:text-slate-400 transition-colors"
                     >
-                        📋 Appointments
-                    </a>
+                        <MdAssignment className="w-5 h-5 mr-2" />
+                        Appointments
+                    </Link>
                 </nav>
             </aside>
 

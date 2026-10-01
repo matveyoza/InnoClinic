@@ -1,8 +1,31 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Outlet, Navigate } from "react-router-dom";
+import { useAuth } from "../store/useAuth";
+import { useEffect } from "react";
+import { api } from "../api/axios";
+import { useUserStore } from "../store/useUserStore";
 
 export const ProtectedRoute = () => {
-    const { isAuthenticated, loading } = useAuth();
+    const isAuthenticated = useAuth(state => state.isAuthenticated);
+    const loading = useAuth(state => state.loading);
+    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);    const setLoading = useAuth(state => state.setLoading);
+    const setUser = useUserStore(state => state.setUser);
+
+    useEffect(() => {
+        const checkAuthStatus = async () => {
+            try {
+                const response = await api.get('/auth/check');
+                setUser(response.data);
+                setIsAuthenticated(true);
+            } catch (error) {
+                setIsAuthenticated(false);
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkAuthStatus();
+    }, [setIsAuthenticated, setLoading, setUser]);
 
     if (loading) {
         return (
@@ -14,5 +37,9 @@ export const ProtectedRoute = () => {
         );
     }
 
-    return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return <Outlet />;
 };

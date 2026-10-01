@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { useAuth } from '../store/useAuth';
+import { useUserStore } from '../store/useUserStore';
 
 export const api = axios.create({
     baseURL: 'https://localhost:7096/api',
@@ -8,16 +10,18 @@ export const api = axios.create({
     },
 });
 
-export const setupAxiosInterceptors = (onUnauthorized: () => void) => {
-    const interceptorId = api.interceptors.response.use(
-        (response) => response,
-        (error) => {
-            if (error.response && error.response.status === 401) {
-                onUnauthorized();
-            }
-            return Promise.reject(error);
-        }
-    );
+export const setupAxiosInterceptors = () => {
+  const interceptorId = api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      const isCheckEndpoint = error.config?.url?.includes('/auth/check');
 
-    return () => api.interceptors.response.eject(interceptorId);
+      if (error.response?.status === 401 && !isCheckEndpoint) {
+        useAuth.getState().setIsAuthenticated(false);
+        useUserStore.getState().setUser(null);      }
+      return Promise.reject(error);
+    }
+  );
+
+  return () => api.interceptors.response.eject(interceptorId);
 };

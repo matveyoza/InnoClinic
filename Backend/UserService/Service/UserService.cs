@@ -1,8 +1,11 @@
-﻿using Entities.Models;
+﻿using AutoMapper;
+using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
+using Entities.Shared;
 
 namespace Service
 {
@@ -10,70 +13,70 @@ namespace Service
     {
         private readonly UserManager<User> _userManager;
 
-        public UserService(UserManager<User> userManager) =>
+        private readonly IMapper _mapper;
+
+        private readonly ILogger<UserService> _logger;
+
+        public UserService(UserManager<User> userManager, IMapper mapper, ILogger<UserService> logger)
+        {
             _userManager = userManager;
-
-        public async Task<IEnumerable<UserDto>> GetUsersAsync() =>
-            await _userManager.Users
-            .AsNoTracking()
-            .Select(user => new UserDto
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName ?? string.Empty,
-                Email = user.Email ?? string.Empty
-            })
-            .ToListAsync();
-
-
-        public async Task<UserDto?> GetUserByIdAsync(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user is null) return null;
-
-            return new UserDto
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName ?? string.Empty,
-                Email = user.Email ?? string.Empty
-            };
+            _mapper = mapper;
+            _logger = logger;
         }
 
-        public async Task<IdentityResult> CreateUserProfileAsync(UserProfileDto profileDto)
+        public async Task<IEnumerable<UserDto>> GetUsersAsync(CancellationToken cancellationToken)
         {
-            var user = new User
-            {
-                Id = profileDto.Id,
-                Email = profileDto.Email,
-                UserName = profileDto.UserName ?? profileDto.Email,
-                FirstName = profileDto.FirstName,
-                LastName = profileDto.LastName
-            };
+            var users = await _userManager.Users
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
 
-            return await _userManager.CreateAsync(user);
+            return _mapper.Map<IEnumerable<UserDto>>(users);
         }
 
-        public async Task<IdentityResult> DeleteUserAsync(string id)
+        public async Task<Result<UserDto>> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return IdentityResult.Failed();
+            var user = await _userManager.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id.ToString(), cancellationToken);
 
-            return await _userManager.DeleteAsync(user);
+            if (user is null)
+            {
+                return Result.Failure<UserDto>(new Error("User.NotFound", $"User with ID {id} was not found."));
+            }
+
+            var userDto = _mapper.Map<UserDto>(user);
+
+            return Result.Success(userDto);
         }
 
-        public async Task<UserForAuthDto?> GetUserForAuthByEmailAsync(string email)
+        public async Task<bool> CreateUserProfileAsync(UserProfileDto profileDto)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user is null) return null;
+            var user = _mapper.Map<User>(profileDto);
 
-            return new UserForAuthDto
+            var result = await _userManager.CreateAsync(user);
+
+            if (!result.Succeeded)
             {
-                Id = user.Id,
-                Email = user.Email ?? string.Empty,
-                UserName = user.UserName ?? string.Empty,
-                PasswordHash = user.PasswordHash ?? string.Empty
-            };
+                _logger.LogInformation($"Failed profile creation for ID {user.Id}.");
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> DeleteUserAsync(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+                return false;
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+                return false;
+
+            return true;
         }
     }
 }

@@ -1,12 +1,14 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
+import { Link } from "react-router-dom";
 
 export const SignUpPage = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [passwordConfirm, setPasswordConfirm] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [passwordConfirm, setPasswordConfirm] = useState<string>('');
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [showPasswordConfirm, setShowPasswordConfirm] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -18,8 +20,6 @@ export const SignUpPage = () => {
         setErrorMessage('');
         console.log('Signing up with:', { email, password });
     };
-
-    const isPasswordMismatch = Boolean(errorMessage);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -64,9 +64,7 @@ export const SignUpPage = () => {
                                     if (errorMessage) setErrorMessage('');
                                 }}
                                 className={`w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all ${
-                                    isPasswordMismatch
-                                        ? 'border-red-500 ring-2 ring-red-600/50 border-red-600'
-                                        : 'border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                                    errorMessage ? 'border-red-500 ring-2 ring-red-600/50 border-red-600' : 'border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
                                 }`}  
                                 required
                             />
@@ -97,7 +95,7 @@ export const SignUpPage = () => {
                                     if (errorMessage) setErrorMessage('');
                                 }}
                                 className={`w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all ${
-                                    isPasswordMismatch
+                                    errorMessage
                                         ? 'border-red-500 ring-2 ring-red-600/50 border-red-600'
                                         : 'border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
                                 }`}
@@ -140,9 +138,9 @@ export const SignUpPage = () => {
                 <p className="flex justify-between text-sm text-slate-500 mt-6">
                     
                     Have an account?
-                    <a href="#sign-up" className="text-right text-emerald-600 font-semibold hover:underline">
+                    <Link to="/login" className="text-right text-emerald-600 font-semibold hover:underline">
                         Log In
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>

@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Service.Shared;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using System.Net;
 
 namespace Auth.Controllers
 {
@@ -13,65 +11,37 @@ namespace Auth.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-
         public AuthController(IAuthService authService)
         {
             _authService = authService;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterUser([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto registerDto)
         {
-            if (registerDto is null)
-                return BadRequest("User registration payload is null.");
-
             var result = await _authService.RegisterUserAsync(registerDto);
 
-            if (!result.Succeeded)
+            if (!result)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.Code, error.Description);
-                }
-                return BadRequest(ModelState);
+                return BadRequest(new { error = "User registation failed." });
             }
 
-            return StatusCode(201);
+            return Created();
         }
 
-        /*[HttpPost("login")]
-        public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
-        {
-            if (!await _authService.ValidateUserAsync(user))
-                return Unauthorized("Invalid email or password.");
-
-            var tokenDto = await _authService.CreateTokenAsync();
-
-            Response.Cookies.Append("jwt", tokenDto.AccessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(60)
-            });
-
-            return Ok();
-        }*/
-
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] UserForAuthenticationDto userDto)
         {
-            var userDto = new UserForAuthenticationDto
-            {
-                Email = request.Email,
-                Password = request.Password
-            };
-            var (isValid, user) = await _authService.ValidateUserAsync(userDto);
-            if (!isValid || user is null)
+            var user = await _authService.ValidateUserAsync(userDto);
+            if (user is null)
                 return Unauthorized(new { message = "Invalid credentials" });
 
             var jwtTokenDto = await _authService.CreateTokenAsync(user);
-
+            if (string.IsNullOrEmpty(jwtTokenDto?.AccessToken))
+            {
+                return BadRequest(new { message = "Token generation failed" });
+            }
+            
             Response.Cookies.Append("AuthToken", jwtTokenDto.AccessToken, new CookieOptions
             {
                 HttpOnly = true,
@@ -81,18 +51,18 @@ namespace Auth.Controllers
                 Expires = DateTimeOffset.UtcNow.AddHours(24)
             });
 
-            return Ok(new { message = "Login successful" });
+            return Ok(new
+            {
+                id = user.Id,
+                email = user.Email,
+            });
         }
 
-        [HttpGet("me")]
+        [HttpGet("check")]
         [Authorize]
-        public IActionResult GetCurrentUser()
+        public IActionResult AuthCheck()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var email = User.FindFirstValue(ClaimTypes.Email);
-            var userName = User.FindFirstValue(ClaimTypes.Name);
-
-            return Ok(new { id = userId, email, userName });
+            return Ok();
         }
 
         [HttpGet("logout")]

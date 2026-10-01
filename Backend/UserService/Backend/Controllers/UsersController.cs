@@ -12,52 +12,55 @@ namespace UsersPresentation.Controllers
     {
         private readonly IUserService _userService;
 
-        public InternalUsersController(IUserService userService) =>
+        public InternalUsersController(IUserService userService, ILogger<InternalUsersController> logger) =>
             _userService = userService;
 
         [HttpGet(Name = "GetUsers")]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
         {
-            var users = await _userService.GetUsersAsync();
-
+            var users = await _userService.GetUsersAsync(cancellationToken);
             return Ok(users);
         }
 
-        [HttpGet("{id}", Name = "UserById")]
-        public async Task<IActionResult> GetUser(string id)
+        [HttpGet("{id:guid}", Name = "UserById")]
+        public async Task<IActionResult> GetUser(Guid id, CancellationToken cancellationToken)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-            return Ok(user);
+            var result = await _userService.GetUserByIdAsync(id, cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                return NotFound(new { error = result.Error.Code, message = result.Error.Message });
+            }
+
+            return Ok(result.Value);
         }
 
-        [HttpGet("internal/by-email/{email}")]
-        public async Task<IActionResult> GetUserForAuth(string email)
-        {
-            var user = await _userService.GetUserForAuthByEmailAsync(email);
-            if (user is null)
-                return NotFound();
-
-            return Ok(user);
-        }
-
+        [AllowAnonymous]
         [HttpPost("profile")]
         public async Task<IActionResult> CreateUserProfile([FromBody] UserProfileDto profileDto)
         {
             if (profileDto == null || string.IsNullOrEmpty(profileDto.Id))
-                return BadRequest("Invalid profile payload.");
+                return BadRequest(new { error = "Invalid profile payload." });
 
             var result = await _userService.CreateUserProfileAsync(profileDto);
 
-            if (!result.Succeeded)
+            if (!result)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.Code, error.Description);
-                }
-                return BadRequest(ModelState);
+                return BadRequest(new { message = "User profile creation failed." });
             }
 
-            return StatusCode(201);
+            return Created();
+        }
+
+        [HttpDelete("profile")]
+        public async Task<IActionResult> DeleteUserAsync([FromBody] Guid id)
+        {
+            var result = await _userService.DeleteUserAsync(id);
+
+            if (!result)
+                return BadRequest(new { error = "Something went wrong during user deletion." });
+
+            return NoContent();
         }
     }
 }

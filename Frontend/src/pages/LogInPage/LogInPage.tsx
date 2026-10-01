@@ -1,24 +1,39 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
+import { login } from "../../services/authService";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../store/useAuth";
+import { useUserStore } from "../../store/useUserStore";
+import axios from "axios";
 
 export const LogInPage = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);
+    const setUser = useUserStore(state => state.setUser);
     const navigate = useNavigate();
-    const { login } = useAuth();
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const submitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
         setError('');
 
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+
         try {
-            await login({ email, password });
-            navigate('/main');
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Invalid email or password.');
+            const userData = await login({ email, password });
+            setUser(userData);
+            setIsAuthenticated(true);
+            navigate("/main");
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || 'Invalid email or password.');
+            } else if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unknown error occurred during login.');
+            }
         }
     };
 
@@ -33,9 +48,10 @@ export const LogInPage = () => {
                 {error && (
                     <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
                         {error}
-                    </div>)}
+                    </div>
+                )}
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={submitLogin} className="space-y-5">
                     <div>
                         <label
                             htmlFor="email"
@@ -45,9 +61,9 @@ export const LogInPage = () => {
                         </label>
                         <input
                             id="email"
+                            name="email"
+                            placeholder="Email Address"
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
                             required
                         />
@@ -63,9 +79,9 @@ export const LogInPage = () => {
                         <div className="relative">
                             <input
                                 id="password"
+                                name="password"
+                                placeholder="Password"
                                 type={showPassword ? 'text' : 'password'}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
                                 required
                             />
@@ -87,9 +103,9 @@ export const LogInPage = () => {
                             />
                             Remember me
                         </label>
-                        <a href="#forgot-password" className="text-emerald-600 font-medium hover:underline">
+                        <Link to="/forgot-password"  className="text-emerald-600 font-medium hover:underline">
                             Forgot password?
-                        </a>
+                        </Link>
                     </div>
 
                     <button
@@ -103,9 +119,9 @@ export const LogInPage = () => {
                 <p className="flex justify-between text-sm text-slate-500 mt-6">
                     
                     Don't have an account?
-                    <a href="#sign-up" className="text-right text-emerald-600 font-semibold hover:underline">
+                    <Link to="/register" className="text-right text-emerald-600 font-semibold hover:underline">
                         Register
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Entities.Models;
-using Repository.Configurations;
 
 namespace Repository
 {
@@ -16,7 +15,6 @@ namespace Repository
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.Entity<User>(b =>
             {
                 b.Ignore(u => u.PasswordHash);

@@ -18,29 +18,21 @@ namespace UsersPresentation.Controllers
         [HttpGet(Name = "GetUsers")]
         public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
         {
-            try
-            {
-                var users = await _userService.GetUsersAsync();
-                return Ok(users);
-            }
-            catch (OperationCanceledException)
-            {
-                return BadRequest(new { error = "Request cancelled" });
-            }
+            var users = await _userService.GetUsersAsync(cancellationToken);
+            return Ok(users);
         }
 
         [HttpGet("{id:guid}", Name = "UserById")]
         public async Task<IActionResult> GetUser(Guid id, CancellationToken cancellationToken)
         {
-            try
+            var result = await _userService.GetUserByIdAsync(id, cancellationToken);
+
+            if (!result.IsSuccess)
             {
-                var user = await _userService.GetUserByIdAsync(id, cancellationToken);
-                return Ok(user);
+                return NotFound(new { error = result.Error.Code, message = result.Error.Message });
             }
-            catch (OperationCanceledException)
-            {
-                return BadRequest(new { error = "Request cancelled" });
-            }
+
+            return Ok(result.Value);
         }
 
         [AllowAnonymous]

@@ -1,37 +1,31 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../store/useAuth";
 import { useEffect } from "react";
 import { api } from "../api/axios";
-
+import { useUserStore } from "../store/useUserStore";
 
 export const ProtectedRoute = () => {
     const isAuthenticated = useAuth(state => state.isAuthenticated);
     const loading = useAuth(state => state.loading);
-    const setAuth = useAuth(state => state.setAuth);
-    const setLoading = useAuth(state => state.setLoading);
-    const user = useAuth(state => state.user);
-    const navigate = useNavigate();
+    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);    const setLoading = useAuth(state => state.setLoading);
+    const setUser = useUserStore(state => state.setUser);
 
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
                 const response = await api.get('/auth/check');
-                setAuth(response.data || user, true);
+                setUser(response.data);
+                setIsAuthenticated(true);
             } catch (error) {
-                setAuth(null, false);
+                setIsAuthenticated(false);
+                setUser(null);
             } finally {
                 setLoading(false);
             }
         };
 
         checkAuthStatus();
-    }, [setAuth, setLoading, user]);
-
-    useEffect(() => {
-        if (!loading && !isAuthenticated) {
-            navigate("/login", { replace: true });
-        }
-    }, [loading, isAuthenticated, navigate]);
+    }, [setIsAuthenticated, setLoading, setUser]);
 
     if (loading) {
         return (
@@ -44,7 +38,7 @@ export const ProtectedRoute = () => {
     }
 
     if (!isAuthenticated) {
-        return null;
+        return <Navigate to="/login" replace />;
     }
 
     return <Outlet />;

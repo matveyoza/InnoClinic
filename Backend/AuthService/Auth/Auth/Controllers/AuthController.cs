@@ -48,7 +48,7 @@ namespace Auth.Controllers
                 Secure = true,
                 SameSite = SameSiteMode.None,
                 Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddHours(240)
+                Expires = DateTimeOffset.UtcNow.AddHours(24)
             });
 
             return Ok(new

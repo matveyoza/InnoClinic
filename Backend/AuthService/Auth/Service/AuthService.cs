@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Service.Constants;
 using Service.Contracts;
 using Service.Shared;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
-using Service.Constants;
+using System.Text.Json;
 
 namespace Service
 {
@@ -44,7 +45,7 @@ namespace Service
 
             if (!result.Succeeded)
             {
-                _logger.LogWarning("Failed registration attempt. Backend/AuthService/Auth/Auth/Controllers/AuthController.cs Line: 44");
+                _logger.LogError("Failed registration attempt. Backend/AuthService/Auth/Auth/Controllers/AuthController.cs Line: 44");
 
                 return false;
             }
@@ -57,7 +58,7 @@ namespace Service
             if (!profileCreated)
             {
                 await _userManager.DeleteAsync(user);
-                _logger.LogInformation("User Profile Creation failed Backend/AuthService/Auth/Auth/Controllers/AuthController.cs Line: 62");
+                _logger.LogError("User Profile Creation failed Backend/AuthService/Auth/Auth/Controllers/AuthController.cs Line: 62");
                 return false;
             }
 
@@ -108,8 +109,11 @@ namespace Service
         {
             var client = _httpClientFactory.CreateClient(AppConstants.UserServiceHttpClientName);
 
-            var response = await client.PostAsJsonAsync($"{AppConstants.ApiRoute}/users/profile", profileDto);
+            var jsonString = JsonSerializer.Serialize(profileDto);
 
+            var httpContent = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync($"{AppConstants.ApiRoute}/users/profile", httpContent);
             return response.IsSuccessStatusCode;
         }
     }

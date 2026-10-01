@@ -1,7 +1,8 @@
 using Backend.Extensions;
-using Service;
-using Service.Contracts;
 using DotNetEnv;
+using Service;
+using Service.Constants;
+using Service.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,13 +22,13 @@ builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.AddMaps(typeof(Program).Assembly);
+    cfg.AddMaps(typeof(Service.Mapping.MappingProfile).Assembly);
 });
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
+app.UseCors(AppConstants.CorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();

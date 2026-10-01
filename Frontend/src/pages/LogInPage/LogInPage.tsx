@@ -2,12 +2,14 @@ import { useState } from "react";
 import { login } from "../../services/authService";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../store/useAuth";
+import { useUserStore } from "../../store/useUserStore";
 import axios from "axios";
 
 export const LogInPage = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
-    const setAuth = useAuth(state => state.setAuth);
+    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);
+    const setUser = useUserStore(state => state.setUser);
     const navigate = useNavigate();
 
     const submitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -21,12 +23,11 @@ export const LogInPage = () => {
 
         try {
             const userData = await login({ email, password });
-            setAuth(userData, true);
+            setUser(userData);
+            setIsAuthenticated(true);
             navigate("/main");
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                // Adjust '.message' based on your actual .NET backend JSON structure!
-                // It might be err.response.data.title or err.response.data.errors
                 setError(err.response?.data?.message || 'Invalid email or password.');
             } else if (err instanceof Error) {
                 setError(err.message);
@@ -61,7 +62,7 @@ export const LogInPage = () => {
                         <input
                             id="email"
                             name="email"
-                            placeholder=""
+                            placeholder="Email Address"
                             type="email"
                             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
                             required
@@ -79,7 +80,7 @@ export const LogInPage = () => {
                             <input
                                 id="password"
                                 name="password"
-                                placeholder=""
+                                placeholder="Password"
                                 type={showPassword ? 'text' : 'password'}
                                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
                                 required

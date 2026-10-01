@@ -31,12 +31,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddValidatorsFromAssemblyContaining<ServiceAssemblyMarker>();
-
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddMaps(typeof(ServiceAssemblyMarker).Assembly);
-});
+builder.Services.AddServiceLayer();
 
 var app = builder.Build();
 

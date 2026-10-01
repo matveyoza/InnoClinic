@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
+using Service.Constants;
 using System.Text;
 
 namespace Backend.Extensions
@@ -13,7 +14,7 @@ namespace Backend.Extensions
         public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration) =>
             services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy", builder =>
+                options.AddPolicy(AppConstants.CorsPolicy, builder =>
                     builder.WithOrigins("http://localhost:5173")
                     .WithMethods("GET", "POST", "PUT", "DELETE")
                     .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With")

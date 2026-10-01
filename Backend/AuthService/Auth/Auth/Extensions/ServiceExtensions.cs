@@ -48,7 +48,6 @@ namespace AuthPresentation.Extensions
 
         public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
             var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
             var validIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER");
             var validAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE");
@@ -87,7 +86,9 @@ namespace AuthPresentation.Extensions
                     },
                     OnAuthenticationFailed = context =>
                     {
-                        Console.WriteLine($"\n[JWT ERROR] {context.Exception.Message}\n");
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+
+                        logger.LogError(context.Exception, "JWT Authentication failed");
                         return Task.CompletedTask;
                     }
                 };

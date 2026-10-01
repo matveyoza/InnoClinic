@@ -9,6 +9,7 @@ namespace Service.Mapping
         public MappingProfile()
         {
             CreateMap<UserProfileDto, User>();
+            CreateMap<User, UserDto>();
         }
     }
 }

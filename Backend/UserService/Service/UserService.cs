@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
+using Entities.Shared;
 
 namespace Service
 {
@@ -14,42 +15,38 @@ namespace Service
 
         private readonly IMapper _mapper;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(UserManager<User> userManager, IMapper mapper, ILogger logger)
+        public UserService(UserManager<User> userManager, IMapper mapper, ILogger<UserService> logger)
         {
             _userManager = userManager;
             _mapper = mapper;
             _logger = logger;
         }
 
-        public async Task<IEnumerable<UserDto>> GetUsersAsync(CancellationToken cancellationToken) =>
-            await _userManager.Users
+        public async Task<IEnumerable<UserDto>> GetUsersAsync(CancellationToken cancellationToken)
+        {
+            var users = await _userManager.Users
                 .AsNoTracking()
-                .Select(user => new UserDto
-                {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    UserName = user.UserName ?? string.Empty,
-                    Email = user.Email ?? string.Empty
-                })
                 .ToListAsync(cancellationToken);
 
+            return _mapper.Map<IEnumerable<UserDto>>(users);
+        }
 
-        public async Task<UserDto?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<Result<UserDto>> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id.ToString(), cancellationToken);
+            var user = await _userManager.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id.ToString(), cancellationToken);
 
             if (user is null)
-                return null;
-
-            return new UserDto
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName ?? string.Empty,
-                Email = user.Email ?? string.Empty
-            };
+                return Result.Failure<UserDto>(new Error("User.NotFound", $"User with ID {id} was not found."));
+            }
+
+            var userDto = _mapper.Map<UserDto>(user);
+
+            return Result.Success(userDto);
         }
 
         public async Task<bool> CreateUserProfileAsync(UserProfileDto profileDto)

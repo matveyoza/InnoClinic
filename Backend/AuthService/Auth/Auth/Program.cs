@@ -3,9 +3,10 @@ using DotNetEnv;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Service;
-using Service.Contracts;
-using Service.Validators;
 using Service.Constants;
+using Service.Contracts;
+using Service.Mapping;
+using Service.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,12 @@ builder.Services.AddControllers()
 
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddServiceLayer();
+builder.Services.AddValidatorsFromAssembly(typeof(MappingProfile).Assembly);
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(MappingProfile).Assembly);
+});
 
 var app = builder.Build();
 

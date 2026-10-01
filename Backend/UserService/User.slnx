@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Backend/UsersPresentation.csproj" />
+  <Project Path="Entities/Entities.csproj" />
+  <Project Path="Repository/Repository.csproj" />
+  <Project Path="Service/Service.csproj" />
+</Solution>

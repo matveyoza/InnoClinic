@@ -1,22 +1,24 @@
 import { useState } from 'react';
 import type { User } from '../../types/user';
-import guestAvatar from '../../assets/images/guestAvatar.png';
+import guestAvatar from '../../assets/images/guest.jpg';
+import { MdMenu } from 'react-icons/md';
 
-export interface HeaderProps {
-    user: User;
+interface HeaderProps {
+    user: User | null;
     onToggleSidebar: () => void;
 }
 
 export const Header = ({ user, onToggleSidebar }: HeaderProps) => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
     return (
         <header className="flex justify-between items-center px-6 h-24 bg-white border-b border-slate-200 shrink-0">
             <button
                 onClick={onToggleSidebar}
-                className="px-4 py-2 text-sm text-white font-medium cursor-pointer border border-slate-300 rounded-md bg-emerald-500 hover:bg-emerald-600 shadow-xl transition-colors"
+                className="flex items-center px-4 py-2 text-sm text-white font-medium cursor-pointer border border-slate-300 rounded-md bg-emerald-500 hover:bg-emerald-600 shadow-xl transition-colors"
             >
-                ☰ Menu
+                <MdMenu className="w-5 h-5 mr-2" /> 
+                Menu
             </button>
 
             {isDropdownOpen && (
@@ -37,8 +39,8 @@ export const Header = ({ user, onToggleSidebar }: HeaderProps) => {
                 {isDropdownOpen && (
                     <div className="absolute right-0 top-full bg-white shadow-lg rounded-lg p-3 w-40 border border-slate-100 z-20">
                         <div className="mb-1">
-                            <strong className="block text-slate-800 text-sm">{user.name}</strong>
-                            <small className="block text-slate-500 text-xs">{user.role}</small>
+                            <strong className="block text-slate-800 text-sm">{user?.userName}</strong>
+                            <small className="block text-slate-500 text-xs">{user?.email}</small>
                         </div>
 
                         <hr className="my-2 border-slate-100" />

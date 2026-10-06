@@ -1,16 +1,12 @@
 import { Layout } from '../../components/Layout/Layout';
-import type { User } from '../../types/user';
-
-const currentUser: User = {
-        id: '1',
-        name: 'Ilya Peshkur',
-        role: 'Eblan',
-        avatarUrl: "",
-        };
+import { useUserStore } from '../../store/useUserStore';
 
 export const MainPage = () => {
+    const user = useUserStore(state => state.user);
+    console.log('Current store user:', user);
+    
     return (
-        <Layout user={currentUser} >
+        <Layout user={user} >
             <div>
                 <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
             </div>

@@ -15,7 +15,7 @@ namespace Backend.Extensions
             services.AddCors(options =>
             {
                 options.AddPolicy(AppConstants.CorsPolicy, builder =>
-                    builder.WithOrigins("http://localhost:5173")
+                    builder.WithOrigins("https://localhost:5173")
                     .WithMethods("GET", "POST", "PUT", "DELETE")
                     .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With")
                     .AllowCredentials());

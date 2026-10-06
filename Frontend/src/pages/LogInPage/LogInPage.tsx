@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { login } from "../../services/authService";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../store/useAuth";
 import { useUserStore } from "../../store/useUserStore";
 import axios from "axios";
+import type { User } from "../../types/user";
+import { authApi } from "../../api/axios";
 
 export const LogInPage = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -22,8 +23,8 @@ export const LogInPage = () => {
         const password = formData.get("password") as string;
 
         try {
-            const userData = await login({ email, password });
-            setUser(userData);
+            const response = await authApi.post<User>('/auth/login', { email, password });
+            setUser(response.data);
             setIsAuthenticated(true);
             navigate("/main");
         } catch (err) {

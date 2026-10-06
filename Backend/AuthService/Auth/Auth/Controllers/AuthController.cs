@@ -51,10 +51,14 @@ namespace Auth.Controllers
                 Expires = DateTimeOffset.UtcNow.AddHours(24)
             });
 
+
+
             return Ok(new
             {
                 id = user.Id,
+                userName = user.UserName ?? user.Email,
                 email = user.Email,
+                avatarUrl = string.Empty
             });
         }
 

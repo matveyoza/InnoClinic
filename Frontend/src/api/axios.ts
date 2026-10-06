@@ -2,7 +2,15 @@ import axios from 'axios';
 import { useAuth } from '../store/useAuth';
 import { useUserStore } from '../store/useUserStore';
 
-export const api = axios.create({
+export const userApi = axios.create({
+    baseURL: 'https://localhost:7183/api',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+export const authApi = axios.create({
     baseURL: 'https://localhost:7096/api',
     withCredentials: true,
     headers: {
@@ -11,7 +19,7 @@ export const api = axios.create({
 });
 
 export const setupAxiosInterceptors = () => {
-  const interceptorId = api.interceptors.response.use(
+  const interceptorId = authApi.interceptors.response.use(
     (response) => response,
     (error) => {
       const isCheckEndpoint = error.config?.url?.includes('/auth/check');
@@ -23,5 +31,5 @@ export const setupAxiosInterceptors = () => {
     }
   );
 
-  return () => api.interceptors.response.eject(interceptorId);
+  return () => authApi.interceptors.response.eject(interceptorId);
 };

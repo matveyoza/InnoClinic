@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
+using System.Security.Claims;
 
 namespace UsersPresentation.Controllers
 {
@@ -14,6 +15,26 @@ namespace UsersPresentation.Controllers
 
         public InternalUsersController(IUserService userService, ILogger<InternalUsersController> logger) =>
             _userService = userService;
+
+        [HttpGet("current", Name = "GetCurrentUser")]
+        public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid or missing user ID claim in token." });
+            }
+
+            var result = await _userService.GetUserByIdAsync(userId, cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                return NotFound(new { error = result.Error.Code, message = result.Error.Message });
+            }
+
+            return Ok(result.Value);
+        }
 
         [HttpGet(Name = "GetUsers")]
         public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)

@@ -1,20 +1,22 @@
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../store/useAuth";
 import { useEffect } from "react";
-import { api } from "../api/axios";
+import { userApi, authApi } from "../api/axios";
 import { useUserStore } from "../store/useUserStore";
 
 export const ProtectedRoute = () => {
     const isAuthenticated = useAuth(state => state.isAuthenticated);
     const loading = useAuth(state => state.loading);
-    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);    const setLoading = useAuth(state => state.setLoading);
+    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);
+    const setLoading = useAuth(state => state.setLoading);
     const setUser = useUserStore(state => state.setUser);
 
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
-                const response = await api.get('/auth/check');
-                setUser(response.data);
+                await authApi.get('/auth/check');
+                const userResponse = await userApi.get('/users/current');
+                setUser(userResponse.data);
                 setIsAuthenticated(true);
             } catch (error) {
                 setIsAuthenticated(false);

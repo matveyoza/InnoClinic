@@ -66,7 +66,7 @@ namespace Service
             return true;
         }
 
-        public async Task<User?> ValidateUserAsync(UserForAuthenticationDto userForAuth)
+        public async Task<User?> AuthenticateUserAsync(UserForAuthenticationDto userForAuth)
         {
             var user = await _userManager.FindByEmailAsync(userForAuth.Email);
 

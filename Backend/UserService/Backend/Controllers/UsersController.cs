@@ -39,9 +39,6 @@ namespace UsersPresentation.Controllers
         [HttpPost("profile")]
         public async Task<IActionResult> CreateUserProfile([FromBody] UserProfileDto profileDto)
         {
-            if (profileDto == null || string.IsNullOrEmpty(profileDto.Id))
-                return BadRequest(new { error = "Invalid profile payload." });
-
             var result = await _userService.CreateUserProfileAsync(profileDto);
 
             if (!result)

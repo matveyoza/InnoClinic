@@ -6,7 +6,6 @@ using Service;
 using Service.Constants;
 using Service.Contracts;
 using Service.Mapping;
-using Service.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 

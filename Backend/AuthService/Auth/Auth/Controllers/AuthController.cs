@@ -17,7 +17,7 @@ namespace Auth.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto registerDto)
+        public async Task<IActionResult> RegisterUserAsync([FromBody] UserForRegistrationDto registerDto)
         {
             var result = await _authService.RegisterUserAsync(registerDto);
 
@@ -30,10 +30,15 @@ namespace Auth.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserForAuthenticationDto userDto)
+        public async Task<IActionResult> LoginAsync([FromBody] UserForAuthenticationDto userDto)
         {
-            var user = await _authService.ValidateUserAsync(userDto);
+            var user = await _authService.AuthenticateUserAsync(userDto);
             if (user is null)
+                Email = request.Email,
+                Password = request.Password
+            };
+            var (isValid, user) = await _authService.ValidateUserAsync(userDto);
+            if (!isValid || user is null)
                 return Unauthorized(new { message = "Invalid credentials" });
 
             var jwtTokenDto = await _authService.CreateTokenAsync(user);

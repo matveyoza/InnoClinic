@@ -34,3 +34,20 @@ obj/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Ignore image formats
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.webp
+*.bmp
+*.ico
+*.tiff
+*.psd
+
+# Ignore temporary/uploaded media directories (if applicable)
+**/wwwroot/images/
+**/public/images/
+**/uploads/

@@ -30,15 +30,10 @@ namespace Auth.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync([FromBody] UserForAuthenticationDto userDto)
+        public async Task<IActionResult> Login([FromBody] UserForAuthenticationDto userDto)
         {
             var user = await _authService.AuthenticateUserAsync(userDto);
             if (user is null)
-                Email = request.Email,
-                Password = request.Password
-            };
-            var (isValid, user) = await _authService.ValidateUserAsync(userDto);
-            if (!isValid || user is null)
                 return Unauthorized(new { message = "Invalid credentials" });
 
             var jwtTokenDto = await _authService.CreateTokenAsync(user);
@@ -46,7 +41,7 @@ namespace Auth.Controllers
             {
                 return BadRequest(new { message = "Token generation failed" });
             }
-            
+
             Response.Cookies.Append("AuthToken", jwtTokenDto.AccessToken, new CookieOptions
             {
                 HttpOnly = true,

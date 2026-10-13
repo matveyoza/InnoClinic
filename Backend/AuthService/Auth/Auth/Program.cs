@@ -21,7 +21,7 @@ builder.Services.ConfigureCors(builder.Configuration);
 
 builder.Services.AddHttpClient("UserService", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:UserServiceUrl"] ?? "https://localhost:7183/");
+    client.BaseAddress = new Uri(builder.Configuration["Services:UserServiceUrl"] ?? AppConstants.UserServiceUrl);
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();

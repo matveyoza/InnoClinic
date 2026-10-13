@@ -58,15 +58,7 @@ namespace Auth.Controllers
                 id = user.Id,
                 userName = user.UserName ?? user.Email,
                 email = user.Email,
-                avatarUrl = string.Empty
             });
-        }
-
-        [HttpGet("check")]
-        [Authorize]
-        public IActionResult AuthCheck()
-        {
-            return Ok();
         }
 
         [HttpGet("logout")]

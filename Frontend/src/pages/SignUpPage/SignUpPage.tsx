@@ -18,7 +18,6 @@ export const SignUpPage = () => {
         }
 
         setErrorMessage('');
-        console.log('Signing up with:', { email, password });
     };
 
     return (
@@ -57,6 +56,7 @@ export const SignUpPage = () => {
                         <div className="relative">
                             <input
                                 id="password"
+                                placeholder="Create Password"
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => {
@@ -88,6 +88,7 @@ export const SignUpPage = () => {
                         <div className="relative">
                             <input
                                 id="passwordConfirm"
+                                placeholder="Confirm Password"
                                 type={showPasswordConfirm ? 'text' : 'password'}
                                 value={passwordConfirm}
                                 onChange={(e) => {

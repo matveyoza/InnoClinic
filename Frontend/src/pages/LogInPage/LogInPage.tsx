@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../store/useAuth";
+import { useAuthStore } from "../../store/useAuthStore";
 import { useUserStore } from "../../store/useUserStore";
 import axios from "axios";
 import type { User } from "../../types/user";
@@ -9,13 +9,12 @@ import { authApi } from "../../api/axios";
 export const LogInPage = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
-    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);
+    const setIsAuthenticated = useAuthStore(state => state.setIsAuthenticated);
     const setUser = useUserStore(state => state.setUser);
     const navigate = useNavigate();
 
     const submitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         setError('');
 
         const formData = new FormData(e.currentTarget);
@@ -23,7 +22,8 @@ export const LogInPage = () => {
         const password = formData.get("password") as string;
 
         try {
-            const response = await authApi.post<User>('/auth/login', { email, password });
+            const response = await authApi.post<User>('/login', { email, password });
+
             setUser(response.data);
             setIsAuthenticated(true);
             navigate("/main");

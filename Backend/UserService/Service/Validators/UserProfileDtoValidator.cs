@@ -10,16 +10,13 @@ namespace Service.Validators
             RuleFor(x => x.Id)
                 .NotEmpty()
                 .WithMessage("User ID is required.")
-                .Must(BeAValidGuid)
+                .Must(id => Guid.TryParse(id, out _))
                 .WithMessage("User ID must be a valid GUID format.");
             RuleFor(x => x.Email)
                 .NotEmpty()
-                .WithMessage("User Email is required.");
-        }
-
-        private bool BeAValidGuid(string id)
-        {
-            return Guid.TryParse(id, out _);
+                .WithMessage("User Email is required.")
+                .EmailAddress()
+                .WithMessage("A valid email address is required.");
         }
     }
 }

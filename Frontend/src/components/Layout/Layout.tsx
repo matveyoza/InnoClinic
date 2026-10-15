@@ -5,11 +5,11 @@ import type { User } from '../../types/user';
 
 interface LayoutProps {
     children: React.ReactNode;
-    user: User;
+    user: User | null;
 }
 
 export const Layout = ({ children, user }: LayoutProps) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   return (
     <div className="flex flex-col h-screen bg-emerald-50 overflow-hidden">

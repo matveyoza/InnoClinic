@@ -3,6 +3,7 @@ import { LogInPage } from "./pages/LogInPage/LogInPage";
 import { MainPage } from "./pages/MainPage/MainPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { GlobalError } from "./components/GlobalError";
+import { SignUpPage } from "./pages/SignUpPage/SignUpPage";
 
 const router = createBrowserRouter([
     {
@@ -11,6 +12,10 @@ const router = createBrowserRouter([
             {
                 path: "/login",
                 element: <LogInPage />,
+            },
+            {
+                path: "/register",
+                element: <SignUpPage />,
             },
             {
                 element: <ProtectedRoute />,

@@ -38,6 +38,7 @@ export const SignUpPage = () => {
                         </label>
                         <input
                             id="email"
+                            placeholder="Email Adress"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}

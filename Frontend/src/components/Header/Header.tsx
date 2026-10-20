@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { User } from '../../types/user';
 import guestAvatar from '../../assets/images/guest.jpg';
 import { MdMenu } from 'react-icons/md';
+import { logout } from '../../services/authService';
 
 interface HeaderProps {
     user: User | null;
@@ -51,7 +52,10 @@ export const Header = ({ user, onToggleSidebar }: HeaderProps) => {
                         <button className="block w-full text-left px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-50 rounded cursor-pointer">
                             Settings
                         </button>
-                        <button className="block w-full text-left px-2 py-1.5 text-sm text-red-500 hover:bg-slate-50 rounded cursor-pointer">
+                        <button
+                            className="block w-full text-left px-2 py-1.5 text-sm text-red-500 hover:bg-slate-50 rounded cursor-pointer"
+                            onClick={logout}    
+                        >
                             Log Out
                         </button>
                     </div>

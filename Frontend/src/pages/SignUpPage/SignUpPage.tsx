@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 
 export const SignUpPage = () => {
+    const [userName, setUserName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [passwordConfirm, setPasswordConfirm] = useState<string>('');
@@ -31,14 +32,32 @@ export const SignUpPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
                         <label
+                            htmlFor="username"
+                            className="block text-sm font-medium text-slate-700 mb-1"
+                        >
+                            Username
+                        </label>
+                        <input
+                            id="username"
+                            placeholder="Username"
+                            type="text"
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label
                             htmlFor="email"
                             className="block text-sm font-medium text-slate-700 mb-1"
                         >
-                            Email Adress
+                            Email Address
                         </label>
                         <input
                             id="email"
-                            placeholder="Email Adress"
+                            placeholder="Email Address"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}

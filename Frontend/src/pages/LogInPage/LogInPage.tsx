@@ -58,7 +58,7 @@ export const LogInPage = () => {
                             htmlFor="email"
                             className="block text-sm font-medium text-slate-700 mb-1"
                         >
-                            Email Adress
+                            Email Address
                         </label>
                         <input
                             id="email"

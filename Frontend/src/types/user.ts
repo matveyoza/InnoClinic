@@ -6,3 +6,9 @@ export interface User {
     lastName?: string;
     avatarUrl?: string;
 }
+
+export interface RegisterUser {
+    userName: string;
+    email: string;
+    password: string;
+}

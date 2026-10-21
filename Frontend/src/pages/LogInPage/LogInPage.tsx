@@ -5,6 +5,23 @@ import { useUserStore } from "../../store/useUserStore";
 import axios from "axios";
 import type { User } from "../../types/user";
 import { authApi } from "../../api/axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const loginSchema = z.object({
+    email: z
+        .string()
+        .min(1, "Email address is required")
+        .email("Please enter a valid email address"),
+    password: z
+        .string()
+        .min(1, "Password is required")
+        .min(8, "Password must be at least 8 characters long"),
+    rememberMe: z.boolean(),
+});
+
+type LoginInputs = z.infer<typeof loginSchema>;
 
 export const LogInPage = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -13,16 +30,27 @@ export const LogInPage = () => {
     const setUser = useUserStore(state => state.setUser);
     const navigate = useNavigate();
 
-    const submitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<LoginInputs>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+            rememberMe: false,
+        },
+    });
+
+    const submitLogin = async (data: LoginInputs) => {
         setError('');
 
-        const formData = new FormData(e.currentTarget);
-        const email = formData.get("email") as string;
-        const password = formData.get("password") as string;
-
         try {
-            const response = await authApi.post<User>('/login', { email, password });
+            const response = await authApi.post<User>('/login', {
+                email: data.email,
+                password: data.password
+            });
 
             setUser(response.data);
             setIsAuthenticated(true);
@@ -52,7 +80,7 @@ export const LogInPage = () => {
                     </div>
                 )}
 
-                <form onSubmit={submitLogin} className="space-y-5">
+                <form onSubmit={handleSubmit(submitLogin)} className="space-y-5">
                     <div>
                         <label
                             htmlFor="email"
@@ -62,12 +90,26 @@ export const LogInPage = () => {
                         </label>
                         <input
                             id="email"
-                            name="email"
                             placeholder="Email Address"
                             type="email"
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
-                            required
+                            className={`w-full px-4 py-2.5 rounded-xl border text-slate-800 text-sm transition-all ${
+                                errors.email
+                                    ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                                    : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                            }`}
+                            {...register("email", {
+                                required: "Email address is required",
+                                pattern: {
+                                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                    message: "Please enter a valid email address",
+                                },
+                            })}
                         />
+                        {errors.email && (
+                            <p className="text-red-500 text-xs font-medium mt-1.5">
+                                {errors.email.message}
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -80,11 +122,20 @@ export const LogInPage = () => {
                         <div className="relative">
                             <input
                                 id="password"
-                                name="password"
                                 placeholder="Password"
                                 type={showPassword ? 'text' : 'password'}
-                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
-                                required
+                                className={`w-full px-4 py-2.5 rounded-xl border text-slate-800 text-sm transition-all ${
+                                    errors.password
+                                        ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                                        : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                                }`}
+                                {...register("password", {
+                                    required: "Password is required",
+                                    minLength: {
+                                        value: 8,
+                                        message: "Password must be at least 8 characters long",
+                                    },
+                                })}
                             />
                             <button
                                 type="button"
@@ -94,6 +145,11 @@ export const LogInPage = () => {
                                 {showPassword ? 'Hide' : 'Show'}
                             </button>
                         </div>
+                        {errors.password && (
+                            <p className="text-red-500 text-xs font-medium mt-1.5">
+                                {errors.password.message}
+                            </p>
+                        )}
                     </div>
 
                     <div className="flex items-center justify-between text-sm">
@@ -101,6 +157,7 @@ export const LogInPage = () => {
                             <input
                                 type="checkbox"
                                 className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 mr-2"
+                                {...register("rememberMe")}
                             />
                             Remember me
                         </label>
@@ -111,9 +168,10 @@ export const LogInPage = () => {
 
                     <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
                     >
-                        Sign In
+                        {isSubmitting ? "Signing In..." : "Sign In"}
                     </button>
                 </form>
 

@@ -10,15 +10,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const loginSchema = z.object({
-    email: z
-        .string()
+    email:
+        z.string()
         .min(1, "Email address is required")
         .email("Please enter a valid email address"),
-    password: z
-        .string()
+    password:
+        z.string()
         .min(1, "Password is required")
         .min(8, "Password must be at least 8 characters long"),
-    rememberMe: z.boolean(),
+    rememberMe:
+        z.boolean(),
 });
 
 type LoginInputs = z.infer<typeof loginSchema>;
@@ -97,13 +98,7 @@ export const LogInPage = () => {
                                     ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
                                     : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
                             }`}
-                            {...register("email", {
-                                required: "Email address is required",
-                                pattern: {
-                                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                    message: "Please enter a valid email address",
-                                },
-                            })}
+                            {...register("email")}
                         />
                         {errors.email && (
                             <p className="text-red-500 text-xs font-medium mt-1.5">
@@ -129,13 +124,7 @@ export const LogInPage = () => {
                                         ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
                                         : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
                                 }`}
-                                {...register("password", {
-                                    required: "Password is required",
-                                    minLength: {
-                                        value: 8,
-                                        message: "Password must be at least 8 characters long",
-                                    },
-                                })}
+                                {...register("password")}
                             />
                             <button
                                 type="button"

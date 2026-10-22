@@ -9,22 +9,23 @@ import { z } from "zod";
 
 const signUpSchema = z
     .object({
-        username: z
-            .string()
+        username:
+            z.string()
             .min(1, "Username is required")
             .min(3, "Username must be at least 3 characters"),
-        email: z
-            .string()
+        email:
+            z.string()
             .min(1, "Email address is required")
             .email("Please enter a valid email address"),
-        password: z
-            .string()
+        password:
+            z.string()
             .min(1, "Password is required")
             .min(8, "Password must be at least 8 characters"),
-        passwordConfirm: z
-            .string()
+        passwordConfirm:
+            z.string()
             .min(1, "Please confirm your password"),
-        rememberMe: z.boolean(),
+        rememberMe:
+            z.boolean(),
     })
     .refine((data) => data.password === data.passwordConfirm, {
         message: "The passwords don't match",
@@ -108,9 +109,7 @@ export const SignUpPage = () => {
                                     ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
                                     : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
                             }`}
-                            {...register("username", {
-                                required: "Username is required",
-                            })}
+                            {...register("username")}
                         />
                         {errors.username && (
                             <p className="text-red-500 text-xs font-medium mt-1.5">
@@ -135,13 +134,7 @@ export const SignUpPage = () => {
                                     ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
                                     : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
                             }`}
-                            {...register("email", {
-                                required: "Email address is required",
-                                pattern: {
-                                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                    message: "Please enter a valid email address",
-                                },
-                            })}
+                            {...register("email")}
                         />
                         {errors.email && (
                             <p className="text-red-500 text-xs font-medium mt-1.5">
@@ -167,9 +160,7 @@ export const SignUpPage = () => {
                                         ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
                                         : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
                                 }`}
-                                {...register("password", {
-                                    required: "Password is required",
-                                })}
+                                {...register("password")}
                             />
                             <button
                                 type="button"

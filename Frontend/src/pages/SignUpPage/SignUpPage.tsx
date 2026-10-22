@@ -1,35 +1,98 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import type { RegisterUser } from "../../types/registerUser";
+import { authApi } from "../../api/axios";
+import axios from "axios";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const signUpSchema = z
+    .object({
+        username:
+            z.string()
+            .min(1, "Username is required")
+            .min(3, "Username must be at least 3 characters"),
+        email:
+            z.string()
+            .min(1, "Email address is required")
+            .email("Please enter a valid email address"),
+        password:
+            z.string()
+            .min(1, "Password is required")
+            .min(8, "Password must be at least 8 characters"),
+        passwordConfirm:
+            z.string()
+            .min(1, "Please confirm your password"),
+        rememberMe:
+            z.boolean(),
+    })
+    .refine((data) => data.password === data.passwordConfirm, {
+        message: "The passwords don't match",
+        path: ["passwordConfirm"],
+    });
+
+type SignUpInputs = z.infer<typeof signUpSchema>;
 
 export const SignUpPage = () => {
-    const [userName, setUserName] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [passwordConfirm, setPasswordConfirm] = useState<string>('');
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showPasswordConfirm, setShowPasswordConfirm] = useState<boolean>(false);
-    const [errorMessage, setErrorMessage] = useState<string>('');
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const [serverError, setServerError] = useState<string>('');
+    const navigate = useNavigate();
 
-        if (password !== passwordConfirm) {
-            setErrorMessage("The passwords don't match");
-            return;
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<SignUpInputs>({
+        resolver: zodResolver(signUpSchema),
+        defaultValues: {
+            username: "",
+            email: "",
+            password: "",
+            passwordConfirm: "",
+            rememberMe: false,
+        },
+    });
+
+    const onSubmit = async (data: SignUpInputs) => {
+        setServerError('');
+
+        const payload = {
+            username: data.username,
+            email: data.email,
+            password: data.password,
+        };
+
+        try {
+            await authApi.post<RegisterUser>('/register', payload);
+            navigate("/login");
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                setServerError(err.response?.data?.message || 'Invalid email or password.');
+            } else if (err instanceof Error) {
+                setServerError(err.message);
+            } else {
+                setServerError('An unknown error occurred during registration.');
+            }
         }
-
-        setErrorMessage('');
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
             <div className="max-w-md w-full bg-white rounded-2xl shadow-lg border border-slate-100 p-8">
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-slate-800">InnoClinic</h1>
-                        <h2 className="text-slate-500 text-sm mt-2">Sign Up</h2>
-                    </div>
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-slate-800">InnoClinic</h1>
+                    <h2 className="text-slate-500 text-sm mt-2">Sign Up</h2>
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                {serverError && (
+                    <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
+                        {serverError}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div>
                         <label
                             htmlFor="username"
@@ -41,11 +104,18 @@ export const SignUpPage = () => {
                             id="username"
                             placeholder="Username"
                             type="text"
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
-                            required
+                            className={`w-full px-4 py-2.5 rounded-xl border text-slate-800 text-sm transition-all ${
+                                errors.username
+                                    ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                                    : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                            }`}
+                            {...register("username")}
                         />
+                        {errors.username && (
+                            <p className="text-red-500 text-xs font-medium mt-1.5">
+                                {errors.username.message}
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -59,17 +129,24 @@ export const SignUpPage = () => {
                             id="email"
                             placeholder="Email Address"
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all"
-                            required
+                            className={`w-full px-4 py-2.5 rounded-xl border text-slate-800 text-sm transition-all ${
+                                errors.email
+                                    ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                                    : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                            }`}
+                            {...register("email")}
                         />
+                        {errors.email && (
+                            <p className="text-red-500 text-xs font-medium mt-1.5">
+                                {errors.email.message}
+                            </p>
+                        )}
                     </div>
 
                     <div>
                         <label
-                        htmlFor="password"
-                        className="block text-sm font-medium text-slate-700 mb-1"
+                            htmlFor="password"
+                            className="block text-sm font-medium text-slate-700 mb-1"
                         >
                             Create password
                         </label>
@@ -78,15 +155,12 @@ export const SignUpPage = () => {
                                 id="password"
                                 placeholder="Create Password"
                                 type={showPassword ? 'text' : 'password'}
-                                value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value);
-                                    if (errorMessage) setErrorMessage('');
-                                }}
-                                className={`w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all ${
-                                    errorMessage ? 'border-red-500 ring-2 ring-red-600/50 border-red-600' : 'border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
-                                }`}  
-                                required
+                                className={`w-full px-4 py-2.5 rounded-xl border text-slate-800 text-sm transition-all ${
+                                    errors.password
+                                        ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                                        : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                                }`}
+                                {...register("password")}
                             />
                             <button
                                 type="button"
@@ -96,12 +170,17 @@ export const SignUpPage = () => {
                                 {showPassword ? 'Hide' : 'Show'}
                             </button>
                         </div>
+                        {errors.password && (
+                            <p className="text-red-500 text-xs font-medium mt-1.5">
+                                {errors.password.message}
+                            </p>
+                        )}
                     </div>
 
                     <div>
                         <label
-                        htmlFor="password"
-                        className="block text-sm font-medium text-slate-700 mb-1"
+                            htmlFor="passwordConfirm"
+                            className="block text-sm font-medium text-slate-700 mb-1"
                         >
                             Confirm password
                         </label>
@@ -110,17 +189,12 @@ export const SignUpPage = () => {
                                 id="passwordConfirm"
                                 placeholder="Confirm Password"
                                 type={showPasswordConfirm ? 'text' : 'password'}
-                                value={passwordConfirm}
-                                onChange={(e) => {
-                                    setPasswordConfirm(e.target.value);
-                                    if (errorMessage) setErrorMessage('');
-                                }}
-                                className={`w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 text-sm transition-all ${
-                                    errorMessage
-                                        ? 'border-red-500 ring-2 ring-red-600/50 border-red-600'
-                                        : 'border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                                className={`w-full px-4 py-2.5 rounded-xl border text-slate-800 text-sm transition-all ${
+                                    errors.passwordConfirm
+                                        ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                                        : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
                                 }`}
-                                required
+                                {...register("passwordConfirm")}
                             />
                             <button
                                 type="button"
@@ -130,34 +204,34 @@ export const SignUpPage = () => {
                                 {showPasswordConfirm ? 'Hide' : 'Show'}
                             </button>
                         </div>
-
-                        {errorMessage && (
+                        {errors.passwordConfirm && (
                             <p className="text-red-500 text-xs font-medium mt-1.5">
-                                {errorMessage}
+                                {errors.passwordConfirm.message}
                             </p>
                         )}
                     </div>
 
-                    <div className="text-emerald-600 font-medium hover: text-sm">
+                    <div className="text-emerald-600 font-medium text-sm">
                         <label className="flex items-center text-slate-600 cursor-pointer">
                             <input
                                 type="checkbox"
                                 className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 mr-2"
+                                {...register("rememberMe")}
                             />
                             Remember me
                         </label>
                     </div>
 
                     <button
-                    type="submit"
-                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-medium rounded-xl shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
                     >
-                        Sign Up
+                        {isSubmitting ? "Signing Up..." : "Sign Up"}
                     </button>
                 </form>
 
                 <p className="flex justify-between text-sm text-slate-500 mt-6">
-                    
                     Have an account?
                     <Link to="/login" className="text-right text-emerald-600 font-semibold hover:underline">
                         Log In

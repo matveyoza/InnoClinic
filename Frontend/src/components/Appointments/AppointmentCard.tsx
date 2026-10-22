@@ -8,35 +8,32 @@ import {
     FaTimes, 
     FaExternalLinkAlt 
 } from "react-icons/fa";
-import type { Appointment, AppointmentDocument } from "../../types/appointment";
+import { AppointmentStatus } from "../../types/appointment";
+import type { Appointment } from "../../types/appointment";
+import type { AppointmentDocument } from "../../types/appointmentDocument";
 
 interface AppointmentCardProps {
     appointment: Appointment;
 }
 
+const STATUS_STYLES: Record<AppointmentStatus, string> = {
+    [AppointmentStatus.Upcoming]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    [AppointmentStatus.Completed]: 'bg-blue-50 text-blue-700 border-blue-200',
+    [AppointmentStatus.Cancelled]: 'bg-slate-100 text-slate-500 border-slate-200',
+};
+
 export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
     const [selectedDoc, setSelectedDoc] = useState<AppointmentDocument | null>(null);
 
-    const getStatusBadge = (status: Appointment['status']) => {
-        switch (status) {
-            case 'Upcoming':
-                return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-            case 'Completed':
-                return 'bg-blue-50 text-blue-700 border-blue-200';
-            case 'Cancelled':
-                return 'bg-slate-100 text-slate-500 border-slate-200';
-            default:
-                return 'bg-slate-50 text-slate-700 border-slate-200';
-        }
-    };
+    const StatusBadge = STATUS_STYLES[appointment.status] ?? 'bg-slate-50 text-slate-700 border-slate-200';
 
     return (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-lg shrink-0 overflow-hidden">
-                    {appointment.doctorAvatar ? (
+                    {appointment.doctorAvatarUrl ? (
                         <img
-                            src={appointment.doctorAvatar}
+                            src={appointment.doctorAvatarUrl}
                             alt={appointment.doctorName}
                             className="w-12 h-12 rounded-full object-cover"
                         />
@@ -75,7 +72,7 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
             </div>
 
             <div className="flex flex-col md:items-end gap-2 w-full md:w-auto">
-                <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold w-fit ${getStatusBadge(appointment.status)}`}>
+                <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold w-fit ${StatusBadge}`}>
                     {appointment.status}
                 </span>
 
@@ -118,14 +115,14 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
 
                         <div className="bg-slate-50 p-8 rounded-xl text-center text-slate-400 text-sm mb-6 border border-slate-200 flex flex-col items-center justify-center gap-2">
                             <FaFileAlt className="w-8 h-8 text-slate-300" />
-                            <span>Document preview for <strong className="text-slate-600">{selectedDoc.url}</strong></span>
+                            <span>Document preview for <strong className="text-slate-600">{selectedDoc.fileUrl}</strong></span>
                         </div>
 
                         <div className="flex justify-end gap-2">
                             <a
-                                href={selectedDoc.url}
+                                href={selectedDoc.fileUrl}
                                 target="_blank"
-                                rel="noreferrer"
+                                rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition-colors"
                             >
                                 <FaExternalLinkAlt className="w-3.5 h-3.5" />

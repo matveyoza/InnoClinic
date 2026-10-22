@@ -1,18 +1,19 @@
-export interface AppointmentDocument {
-    id: string;
-    name: string;
-    type: string;
-    url: string;
+import type { AppointmentDocument } from '../types/appointmentDocument';
+
+export const enum AppointmentStatus {
+    Upcoming = 'Upcoming',
+    Completed = 'Completed',
+    Cancelled = 'Cancelled',
 }
 
 export interface Appointment {
     id: string;
     doctorName: string;
     doctorSpecialty: string;
-    doctorAvatar?: string;
+    doctorAvatarUrl?: string;
     date: string;
     time: string;
-    status: 'Upcoming' | 'Completed' | 'Cancelled';
+    status: AppointmentStatus;
     location: string;
     documents?: AppointmentDocument[];
 }

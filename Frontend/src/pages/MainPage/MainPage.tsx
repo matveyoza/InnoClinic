@@ -2,6 +2,7 @@ import { AppointmentCard } from '../../components/Appointments/AppointmentCard';
 import { Layout } from '../../components/Layout/Layout';
 import { useUserStore } from '../../store/useUserStore';
 import type { Appointment } from '../../types/appointment';
+import { AppointmentStatus } from '../../types/appointment';
 
 const mockAppointments: Appointment[] = [
     {
@@ -10,11 +11,11 @@ const mockAppointments: Appointment[] = [
         doctorSpecialty: 'Cardiologist',
         date: 'Oct 24, 2026',
         time: '10:30 AM',
-        status: 'Upcoming',
+        status: AppointmentStatus.Upcoming,
         location: 'Cabinet 204, Main Building',
         documents: [
-            { id: 'doc1', name: 'ECG_Report.pdf', type: 'PDF', url: '/docs/ecg.pdf' },
-            { id: 'doc2', name: 'Prescription.pdf', type: 'PDF', url: '/docs/rx.pdf' },
+            { id: 'doc1', name: 'ECG_Report.pdf', type: 'PDF', fileUrl: '/docs/ecg.pdf' },
+            { id: 'doc2', name: 'Prescription.pdf', type: 'PDF', fileUrl: '/docs/rx.pdf' },
         ],
     },
     {
@@ -23,7 +24,7 @@ const mockAppointments: Appointment[] = [
         doctorSpecialty: 'General Practitioner',
         date: 'Oct 28, 2026',
         time: '02:15 PM',
-        status: 'Upcoming',
+        status: AppointmentStatus.Upcoming,
         location: 'Cabinet 101, West Wing',
     },
     {
@@ -32,10 +33,10 @@ const mockAppointments: Appointment[] = [
         doctorSpecialty: 'Dermatologist',
         date: 'Sep 15, 2026',
         time: '11:00 AM',
-        status: 'Completed',
+        status: AppointmentStatus.Completed,
         location: 'Cabinet 305, Main Building',
         documents: [
-            { id: 'doc3', name: 'Skin_Analysis.pdf', type: 'PDF', url: '/docs/skin.pdf' },
+            { id: 'doc3', name: 'Skin_Analysis.pdf', type: 'PDF', fileUrl: '/docs/skin.pdf' },
         ],
     },
 ];
@@ -43,7 +44,7 @@ const mockAppointments: Appointment[] = [
 export const MainPage = () => {
     const user = useUserStore(state => state.user);
 
-    const upcomingCount = mockAppointments.filter(app => app.status === 'Upcoming').length;
+    const upcomingCount = mockAppointments.filter(app => app.status === AppointmentStatus.Upcoming).length;
 
     return (
         <Layout user={user}>

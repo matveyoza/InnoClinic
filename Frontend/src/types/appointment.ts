@@ -1,10 +1,5 @@
 import type { AppointmentDocument } from '../types/appointmentDocument';
-
-export const enum AppointmentStatus {
-    Upcoming = 'Upcoming',
-    Completed = 'Completed',
-    Cancelled = 'Cancelled',
-}
+import { AppointmentStatus } from '../types/enums/appointmentStatus';
 
 export interface Appointment {
     id: string;
@@ -14,6 +9,6 @@ export interface Appointment {
     date: string;
     time: string;
     status: AppointmentStatus;
-    location: string;
+    cabinet: string;
     documents?: AppointmentDocument[];
 }

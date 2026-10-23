@@ -8,7 +8,7 @@ import {
     FaTimes, 
     FaExternalLinkAlt 
 } from "react-icons/fa";
-import { AppointmentStatus } from "../../types/appointment";
+import { AppointmentStatus } from "../../types/enums/appointmentStatus";
 import type { Appointment } from "../../types/appointment";
 import type { AppointmentDocument } from "../../types/appointmentDocument";
 
@@ -46,7 +46,7 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
                     <p className="text-emerald-600 text-xs font-medium">{appointment.doctorSpecialty}</p>
                     <p className="text-slate-400 text-xs mt-1 flex items-center gap-1.5">
                         <FaMapMarkerAlt className="w-3 h-3 text-slate-400 shrink-0" />
-                        <span>{appointment.location}</span>
+                        <span>{appointment.cabinet}</span>
                     </p>
                 </div>
             </div>

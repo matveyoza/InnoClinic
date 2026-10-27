@@ -11,15 +11,15 @@ namespace AppointmentPresentation.Extensions
         public static void ConfigureSqlContext(this IServiceCollection services)
         {
             var connectionString = Environment.GetEnvironmentVariable("USER_DB_CONNECTION");
-            services.AddDbContext<AppointmentDbContext>(opts =>
-                opts.UseSqlServer(connectionString));
+                services.AddDbContext<AppointmentDbContext>(opts =>
+                    opts.UseSqlServer(connectionString));
         }
 
         public static IServiceCollection ConfigureRepository(this IServiceCollection services) =>
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
         public static IServiceCollection ConfigureService(this IServiceCollection services) =>
-        services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
 
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Entities.Models
 {
-    public class Appointment
+    public sealed class Appointment
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -12,15 +12,15 @@
 
         public string? DoctorAvatarUrl { get; set; }
 
-        public string Date { get; set; } = string.Empty;
-        public string Time { get; set; } = string.Empty;
+        public DateOnly Date { get; set; }
+        public TimeOnly Time { get; set; }
 
-        public string Cabinet { get; set; } = string.Empty;
+        public int Room { get; set; }
 
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Upcoming;
 
 
-        public ICollection<AppointmentDocumentItem> Documents { get; set; } = new List<AppointmentDocumentItem>();
+        public ICollection<AppointmentDocument> Documents { get; set; } = new List<AppointmentDocument>();
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     }

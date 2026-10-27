@@ -1,6 +1,9 @@
 using AppointmentPresentation.Extensions;
 using DotNetEnv;
 using Service.Mapping;
+using Service.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 Env.Load();
 
@@ -10,13 +13,16 @@ builder.Services.ConfigureSqlContext();
 
 builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.AddMaps(typeof(Service.Mapping.MappingProfile).Assembly);
+    cfg.AddMaps(typeof(MappingProfile).Assembly);
 });
 
 builder.Services.ConfigureRepository();
 builder.Services.ConfigureService();
 
 builder.Services.AddControllers();
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssembly(typeof(AppointmentForCreationDtoValidator).Assembly);
 
 var app = builder.Build();
 

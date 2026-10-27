@@ -17,21 +17,11 @@ namespace AppointmentPresentation.AppointmentsController
 
 
         [HttpPost]
-        public async Task<IActionResult> Create(
-            [FromBody] CreateAppointmentDto dto,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> Create([FromBody] AppointmentForCreationDto dto, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            await _appointmentService.CreateAsync(dto, cancellationToken);
 
-            var createdAppointment = await _appointmentService.CreateAsync(dto, cancellationToken);
-
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = createdAppointment.Id },
-                createdAppointment);
+            return Created();
         }
 
         [HttpGet]
@@ -42,7 +32,7 @@ namespace AppointmentPresentation.AppointmentsController
         }
 
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(AppointmentDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Dto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var appointment = await _appointmentService.GetByIdAsync(id, cancellationToken);

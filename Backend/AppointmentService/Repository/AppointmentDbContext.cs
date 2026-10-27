@@ -11,7 +11,7 @@ namespace Repository
         }
 
         public DbSet<Appointment> Appointments => Set<Appointment>();
-        public DbSet<AppointmentDocumentItem> AppointmentDocuments => Set<AppointmentDocumentItem>();
+        public DbSet<AppointmentDocument> AppointmentDocuments => Set<AppointmentDocument>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,49 +23,47 @@ namespace Repository
 
                 entity.Property(a => a.PatientName)
                     .IsRequired()
-                    .HasMaxLength(150);
+                    .HasMaxLength(20);
 
                 entity.Property(a => a.DoctorName)
                     .IsRequired()
-                    .HasMaxLength(150);
+                    .HasMaxLength(20);
 
                 entity.Property(a => a.DoctorSpecialty)
                     .IsRequired()
-                    .HasMaxLength(100);
+                    .HasMaxLength(25);
 
                 entity.Property(a => a.Date)
                     .IsRequired()
-                    .HasMaxLength(50);
+                    .HasColumnType("date");
 
                 entity.Property(a => a.Time)
                     .IsRequired()
-                    .HasMaxLength(50);
+                    .HasColumnType("time");
 
-                entity.Property(a => a.Cabinet)
-                    .IsRequired()
-                    .HasMaxLength(200);
+                entity.Property(a => a.Room)
+                    .IsRequired();
 
                 entity.Property(a => a.Status)
                     .HasConversion<string>()
-                    .HasMaxLength(30);
+                    .HasMaxLength(10);
 
                 entity.HasMany(a => a.Documents)
                     .WithOne(d => d.Appointment)
-                    .HasForeignKey(d => d.AppointmentId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .HasForeignKey(d => d.AppointmentId);
             });
 
-            modelBuilder.Entity<AppointmentDocumentItem>(entity =>
+            modelBuilder.Entity<AppointmentDocument>(entity =>
             {
                 entity.HasKey(d => d.Id);
 
                 entity.Property(d => d.Name)
                     .IsRequired()
-                    .HasMaxLength(200);
+                    .HasMaxLength(25);
 
                 entity.Property(d => d.Type)
                     .IsRequired()
-                    .HasMaxLength(50);
+                    .HasMaxLength(20);
 
                 entity.Property(d => d.Url)
                     .HasMaxLength(2083);

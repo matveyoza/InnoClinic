@@ -8,7 +8,6 @@ using Service.Constants;
 using Service.Contracts;
 using Service.Shared;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;

@@ -1,6 +1,6 @@
 ﻿namespace Entities.Models
 {
-    public class AppointmentDocumentItem
+    public sealed class AppointmentDocument
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 

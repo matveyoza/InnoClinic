@@ -15,7 +15,7 @@ namespace Repository
 
         public async Task<Appointment> CreateAsync(Appointment appointment, CancellationToken cancellationToken = default)
         {
-            await _context.Appointments.AddAsync(appointment, cancellationToken);
+            _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync(cancellationToken);
             return appointment;
         }

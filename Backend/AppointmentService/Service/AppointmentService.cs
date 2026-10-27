@@ -3,6 +3,7 @@ using AutoMapper;
 using Entities.Contracts;
 using Entities.Models;
 using Service.Contracts;
+using FluentValidation;
 
 namespace Service
 {
@@ -10,6 +11,7 @@ namespace Service
     {
         private readonly IAppointmentRepository _repository;
         private readonly IMapper _mapper;
+        
 
         public AppointmentService(IAppointmentRepository repository, IMapper mapper)
         {
@@ -17,27 +19,27 @@ namespace Service
             _mapper = mapper;
         }
 
-        public async Task<AppointmentDto> CreateAsync(CreateAppointmentDto dto, CancellationToken cancellationToken = default)
+        public async Task<Dto> CreateAsync(AppointmentForCreationDto dto, CancellationToken cancellationToken = default)
         {
             var appointment = _mapper.Map<Appointment>(dto);
 
             var created = await _repository.CreateAsync(appointment, cancellationToken);
 
-            return _mapper.Map<AppointmentDto>(created);
+            return _mapper.Map<Dto>(created);
         }
 
-        public async Task<IReadOnlyList<AppointmentDto>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<Dto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var appointments = await _repository.GetAllAsync(cancellationToken);
 
-            return _mapper.Map<IReadOnlyList<AppointmentDto>>(appointments);
+            return _mapper.Map<IReadOnlyList<Dto>>(appointments);
         }
 
-        public async Task<AppointmentDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<Dto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var appointment = await _repository.GetByIdAsync(id, cancellationToken);
 
-            return appointment is null ? null : _mapper.Map<AppointmentDto>(appointment);
+            return _mapper.Map<Dto>(appointment);
         }
     }
 }

@@ -8,6 +8,6 @@
         public DateOnly Date { get; init; }
         public TimeOnly Time { get; init; }
         public int Room { get; init; }
-        public IReadOnlyList<DocumentForCreationDto>? Documents { get; init; }
+        public IReadOnlyList<AppointmentDocumentForCreationDto>? Documents { get; init; }
     }
 }

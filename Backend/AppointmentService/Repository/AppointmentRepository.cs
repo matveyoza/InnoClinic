@@ -13,14 +13,13 @@ namespace Repository
             _context = context;
         }
 
-        public async Task<Appointment> CreateAsync(Appointment appointment, CancellationToken cancellationToken = default)
+        public async Task<bool> CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken = default)
         {
             _context.Appointments.Add(appointment);
-            await _context.SaveChangesAsync(cancellationToken);
-            return appointment;
+            return await _context.SaveChangesAsync(cancellationToken) > 0;
         }
 
-        public async Task<IReadOnlyList<Appointment>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<Appointment>> GetAllAppointmentsAsync(CancellationToken cancellationToken = default)
         {
             return await _context.Appointments
                 .Include(a => a.Documents)
@@ -29,12 +28,12 @@ namespace Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default)
         {
             return await _context.Appointments
                 .Include(a => a.Documents)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+                .FirstOrDefaultAsync(a => a.Id == appointmentId, cancellationToken);
         }
     }
 }

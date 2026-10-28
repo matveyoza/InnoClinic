@@ -5,8 +5,7 @@ namespace Repository
 {
     public class AppointmentDbContext : DbContext
     {
-        public AppointmentDbContext(DbContextOptions<AppointmentDbContext> options)
-            : base(options)
+        public AppointmentDbContext(DbContextOptions<AppointmentDbContext> options) : base(options)
         {
         }
 
@@ -61,7 +60,7 @@ namespace Repository
                     .IsRequired()
                     .HasMaxLength(25);
 
-                entity.Property(d => d.Type)
+                entity.Property(d => d.DataType)
                     .IsRequired()
                     .HasMaxLength(20);
 

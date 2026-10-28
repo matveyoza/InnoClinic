@@ -19,7 +19,6 @@
 
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Upcoming;
 
-
         public ICollection<AppointmentDocument> Documents { get; set; } = new List<AppointmentDocument>();
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;

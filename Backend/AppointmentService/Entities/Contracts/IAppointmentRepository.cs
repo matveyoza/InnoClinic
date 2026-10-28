@@ -4,8 +4,8 @@ namespace Entities.Contracts
 {
     public interface IAppointmentRepository
     {
-        Task<Appointment> CreateAsync(Appointment appointment, CancellationToken cancellationToken = default);
-        Task<IReadOnlyList<Appointment>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<bool> CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Appointment>> GetAllAppointmentsAsync(CancellationToken cancellationToken = default);
+        Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default);
     }
 }

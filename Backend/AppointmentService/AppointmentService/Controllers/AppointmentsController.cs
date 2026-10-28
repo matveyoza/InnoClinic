@@ -17,29 +17,31 @@ namespace AppointmentPresentation.AppointmentsController
 
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AppointmentForCreationDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateAppointment([FromBody] AppointmentForCreationDto appointmentDto, CancellationToken cancellationToken)
         {
-            await _appointmentService.CreateAsync(dto, cancellationToken);
+            var isCreated = await _appointmentService.CreateAppointmentAsync(appointmentDto, cancellationToken);
+
+            if (!isCreated)
+                return BadRequest(new { message = "User profile creation failed." });
 
             return Created();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllAppointments(CancellationToken cancellationToken)
         {
-            var appointments = await _appointmentService.GetAllAsync(cancellationToken);
+            var appointments = await _appointmentService.GetAllAppointmentsAsync(cancellationToken);
             return Ok(appointments);
         }
 
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(Dto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAppointmentById(Guid appointmentId, CancellationToken cancellationToken)
         {
-            var appointment = await _appointmentService.GetByIdAsync(id, cancellationToken);
+            var appointment = await _appointmentService.GetAppointmentByIdAsync(appointmentId, cancellationToken);
 
             if (appointment is null)
             {
-                return NotFound(new { message = $"Appointment with ID '{id}' was not found." });
+                return NotFound(new { message = $"Appointment with ID '{appointmentId}' was not found." });
             }
 
             return Ok(appointment);

@@ -4,8 +4,8 @@ namespace Service.Contracts
 {
     public interface IAppointmentService
     {
-        Task<Dto> CreateAsync(AppointmentForCreationDto dto, CancellationToken cancellationToken = default);
-        Task<IReadOnlyList<Dto>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task<Dto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<bool> CreateAppointmentAsync(AppointmentForCreationDto appointmentForCreationDto, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<AppointmentDto>> GetAllAppointmentsAsync(CancellationToken cancellationToken = default);
+        Task<AppointmentDto?> GetAppointmentByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default);
     }
 }

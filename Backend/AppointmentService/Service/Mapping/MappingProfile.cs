@@ -8,12 +8,12 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<AppointmentDocument, DocumentDto>();
+        CreateMap<AppointmentDocument, AppointmentDocumentDto>();
 
-        CreateMap<Appointment, Dto>()
+        CreateMap<Appointment, AppointmentDto>()
             .ForMember(dest => dest.Documents, opt => opt.MapFrom(src => src.Documents));
 
-        CreateMap<DocumentForCreationDto, AppointmentDocument>()
+        CreateMap<AppointmentDocumentForCreationDto, AppointmentDocument>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.AppointmentId, opt => opt.Ignore())
             .ForMember(dest => dest.Appointment, opt => opt.Ignore());

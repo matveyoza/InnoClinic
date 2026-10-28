@@ -19,27 +19,27 @@ namespace Service
             _mapper = mapper;
         }
 
-        public async Task<Dto> CreateAsync(AppointmentForCreationDto dto, CancellationToken cancellationToken = default)
+        public async Task<bool> CreateAppointmentAsync(AppointmentForCreationDto appointmentForCreationDto, CancellationToken cancellationToken = default)
         {
-            var appointment = _mapper.Map<Appointment>(dto);
+            var appointment = _mapper.Map<Appointment>(appointmentForCreationDto);
 
-            var created = await _repository.CreateAsync(appointment, cancellationToken);
+            var isCreated = await _repository.CreateAppointmentAsync(appointment, cancellationToken);
 
-            return _mapper.Map<Dto>(created);
+            return isCreated;
         }
 
-        public async Task<IReadOnlyList<Dto>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<AppointmentDto>> GetAllAppointmentsAsync(CancellationToken cancellationToken = default)
         {
-            var appointments = await _repository.GetAllAsync(cancellationToken);
+            var appointments = await _repository.GetAllAppointmentsAsync(cancellationToken);
 
-            return _mapper.Map<IReadOnlyList<Dto>>(appointments);
+            return _mapper.Map<IReadOnlyList<AppointmentDto>>(appointments);
         }
 
-        public async Task<Dto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<AppointmentDto?> GetAppointmentByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default)
         {
-            var appointment = await _repository.GetByIdAsync(id, cancellationToken);
+            var appointment = await _repository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
 
-            return _mapper.Map<Dto>(appointment);
+            return _mapper.Map<AppointmentDto>(appointment);
         }
     }
 }

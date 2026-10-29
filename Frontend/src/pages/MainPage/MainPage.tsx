@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { AppointmentCard } from '../../components/Appointments/AppointmentCard';
 import { Layout } from '../../components/Layout/Layout';
 import { useUserStore } from '../../store/useUserStore';
@@ -43,7 +44,7 @@ const mockAppointments: Appointment[] = [
 
 export const MainPage = () => {
     const user = useUserStore(state => state.user);
-
+    const navigate = useNavigate();
     const upcomingCount = mockAppointments.filter(app => app.status === AppointmentStatus.Upcoming).length;
 
     return (
@@ -55,6 +56,14 @@ export const MainPage = () => {
             <div className="mt-4.5 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
                 <div className="flex justify-between items-center pb-4 border-b border-slate-100">
                     <h2 className="text-lg font-bold text-slate-800">My Appointments</h2>
+                    
+                    <button
+                        type="button"
+                        onClick={() => navigate('/appointments/create')}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
+                    >
+                        Create Appointment
+                    </button>
 
                     <div className="text-right">
                         <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase block">

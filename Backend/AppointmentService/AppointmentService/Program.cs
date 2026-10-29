@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureSqlContext();
 
+builder.Services.ConfigureJwt();
+
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddMaps(typeof(MappingProfile).Assembly);
@@ -28,6 +30,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

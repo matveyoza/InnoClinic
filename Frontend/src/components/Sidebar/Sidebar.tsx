@@ -1,5 +1,5 @@
-import { NavLink } from "react-router-dom";
 import { MdClose, MdCalendarMonth, MdAssignment } from "react-icons/md";
+import { SidebarNavItem } from "./SidebarNavItem";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -7,12 +7,6 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
-  const getNavLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center px-3 py-2 rounded-md font-medium transition-colors no-underline ${
-      isActive
-        ? "bg-emerald-600 text-white shadow-sm"
-        : "text-slate-700 hover:bg-emerald-100/60 hover:text-emerald-700"
-    }`;
 
   return (
     <>
@@ -32,15 +26,12 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         </div>
 
         <nav className="flex flex-col gap-2">
-          <NavLink to="/main" className={getNavLinkClass} onClick={onClose}>
-            <MdAssignment className="w-5 h-5 mr-3 shrink-0" />
+          <SidebarNavItem to="/main" icon={MdAssignment} onClick={onClose}>
             Appointments
-          </NavLink>
-
-          <NavLink to="/schedule" className={getNavLinkClass} onClick={onClose}>
-            <MdCalendarMonth className="w-5 h-5 mr-3 shrink-0" />
+          </SidebarNavItem>
+          <SidebarNavItem to="/schedule" icon={MdCalendarMonth} onClick={onClose}>
             Doctor Schedule
-          </NavLink>
+          </SidebarNavItem>
         </nav>
       </aside>
 

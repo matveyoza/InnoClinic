@@ -47,6 +47,8 @@ export const MainPage = () => {
     const navigate = useNavigate();
     const upcomingCount = mockAppointments.filter(app => app.status === AppointmentStatus.Upcoming).length;
 
+
+    
     return (
         <Layout user={user}>
             <div>

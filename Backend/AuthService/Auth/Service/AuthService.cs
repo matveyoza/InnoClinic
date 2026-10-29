@@ -39,7 +39,6 @@ namespace Service
         public async Task<bool> RegisterUserAsync(UserForRegistrationDto registerDto)
         {
             var user = _mapper.Map<User>(registerDto);
-
             var result = await _userManager.CreateAsync(user, registerDto.Password);
 
             if (!result.Succeeded)
@@ -48,6 +47,8 @@ namespace Service
 
                 return false;
             }
+
+            await _userManager.AddToRoleAsync(user, "Patient");
 
             var profileDto = _mapper.Map<UserProfileCreationDto>(registerDto);
             profileDto.Id = user.Id;
@@ -88,6 +89,12 @@ namespace Service
                 new Claim(ClaimTypes.Email, user.Email!)
             };
 
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -113,6 +120,7 @@ namespace Service
             var httpContent = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync($"{AppConstants.ApiRoute}/users/profile", httpContent);
+
             return response.IsSuccessStatusCode;
         }
     }

@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
-using System.Text;
 using Service.Constants;
+using System.Security.Claims;
+using System.Text;
 
 namespace AuthPresentation.Extensions
 {
@@ -72,7 +73,9 @@ namespace AuthPresentation.Extensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = validIssuer,
                     ValidAudience = validAudience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
+
+                    RoleClaimType = ClaimTypes.Role
                 };
                 options.Events = new JwtBearerEvents
                 {

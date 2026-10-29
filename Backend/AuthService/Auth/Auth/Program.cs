@@ -40,6 +40,20 @@ builder.Services.AddAutoMapper(cfg =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        await Auth.Extensions.RoleSeeder.SeedRolesAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding roles.");
+    }
+}
+
 app.UseHttpsRedirection();
 app.UseCors(AppConstants.CorsPolicy);
 

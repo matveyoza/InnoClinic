@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Service.Shared;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Auth.Controllers
 {
@@ -11,9 +12,11 @@ namespace Auth.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private readonly UserManager<User> _userManager;
+        public AuthController(IAuthService authService, UserManager<User> userManager)
         {
             _authService = authService;
+            _userManager = userManager;
         }
 
         [HttpPost("register")]
@@ -51,11 +54,15 @@ namespace Auth.Controllers
                 Expires = DateTimeOffset.UtcNow.AddHours(24)
             });
 
+            var roles = await _userManager.GetRolesAsync(user);
+            var primaryRole = roles.FirstOrDefault() ?? "Patient";
+
             return Ok(new
             {
                 id = user.Id,
                 userName = user.UserName ?? user.Email,
                 email = user.Email,
+                role = primaryRole
             });
         }
 

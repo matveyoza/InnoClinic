@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service.Constants;
+using System.Security.Claims;
 using System.Text;
 
 namespace Backend.Extensions
@@ -57,7 +58,9 @@ namespace Backend.Extensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = validIssuer,
                     ValidAudience = validAudience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
+
+                    RoleClaimType = ClaimTypes.Role
                 };
                 options.Events = new JwtBearerEvents
                 {

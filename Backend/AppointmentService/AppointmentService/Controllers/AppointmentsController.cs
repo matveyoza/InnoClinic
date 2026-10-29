@@ -19,6 +19,7 @@ namespace AppointmentPresentation.AppointmentsController
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Patient")]
         public async Task<IActionResult> CreateAppointment([FromBody] AppointmentForCreationDto appointmentDto, CancellationToken cancellationToken)
         {
             var isCreated = await _appointmentService.CreateAppointmentAsync(appointmentDto, cancellationToken);
@@ -30,13 +31,15 @@ namespace AppointmentPresentation.AppointmentsController
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Doctor")]
         public async Task<IActionResult> GetAllAppointments(CancellationToken cancellationToken)
         {
             var appointments = await _appointmentService.GetAllAppointmentsAsync(cancellationToken);
             return Ok(appointments);
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("{appointmentId:guid}")]
+        [Authorize(Roles = "Admin,Doctor,Patient")]
         public async Task<IActionResult> GetAppointmentById([FromRoute] Guid appointmentId, CancellationToken cancellationToken)
         {
             var appointment = await _appointmentService.GetAppointmentByIdAsync(appointmentId, cancellationToken);

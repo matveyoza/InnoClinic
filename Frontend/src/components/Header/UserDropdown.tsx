@@ -38,7 +38,7 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
                     <div className="absolute right-0 top-full bg-white shadow-lg rounded-lg p-3 w-40 border border-slate-100 z-20">
                         <div className="mb-1">
                             <strong className="block text-slate-800 text-sm">{user?.userName}</strong>
-                            <small className="block text-slate-500 text-xs">{user?.email}</small>
+                            <small className="block text-slate-500 text-xs">{Array.isArray(user?.role) ? user?.role[0] : user?.role}</small>
                         </div>
 
                         <hr className="my-2 border-slate-100" />

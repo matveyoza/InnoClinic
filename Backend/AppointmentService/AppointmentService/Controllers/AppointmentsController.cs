@@ -1,11 +1,13 @@
 ﻿using Service.Shared.DataTransferObjects;
 using Service.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AppointmentPresentation.AppointmentsController
 {
     [ApiController]
     [Route("api/appointments")]
+    [Authorize]
     public class AppointmentsController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
@@ -35,7 +37,7 @@ namespace AppointmentPresentation.AppointmentsController
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetAppointmentById(Guid appointmentId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAppointmentById([FromRoute] Guid appointmentId, CancellationToken cancellationToken)
         {
             var appointment = await _appointmentService.GetAppointmentByIdAsync(appointmentId, cancellationToken);
 

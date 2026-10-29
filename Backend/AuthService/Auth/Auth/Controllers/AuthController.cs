@@ -51,8 +51,6 @@ namespace Auth.Controllers
                 Expires = DateTimeOffset.UtcNow.AddHours(24)
             });
 
-
-
             return Ok(new
             {
                 id = user.Id,

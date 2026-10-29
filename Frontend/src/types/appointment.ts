@@ -9,6 +9,6 @@ export interface Appointment {
     date: string;
     time: string;
     status: AppointmentStatus;
-    cabinet: string;
+    room: number;
     documents?: AppointmentDocument[];
 }

@@ -13,7 +13,7 @@ const mockAppointments: Appointment[] = [
         date: 'Oct 24, 2026',
         time: '10:30 AM',
         status: AppointmentStatus.Upcoming,
-        cabinet: 'Cabinet 204',
+        room: 204,
         documents: [
             { id: 'doc1', name: 'ECG_Report.pdf', type: 'PDF', fileUrl: '/docs/ecg.pdf' },
             { id: 'doc2', name: 'Prescription.pdf', type: 'PDF', fileUrl: '/docs/rx.pdf' },
@@ -26,7 +26,7 @@ const mockAppointments: Appointment[] = [
         date: 'Oct 28, 2026',
         time: '02:15 PM',
         status: AppointmentStatus.Upcoming,
-        cabinet: 'Cabinet 101',
+        room: 101,
     },
     {
         id: '3',
@@ -35,7 +35,7 @@ const mockAppointments: Appointment[] = [
         date: 'Sep 15, 2026',
         time: '11:00 AM',
         status: AppointmentStatus.Completed,
-        cabinet: 'Cabinet 305',
+        room: 305,
         documents: [
             { id: 'doc3', name: 'Skin_Analysis.pdf', type: 'PDF', fileUrl: '/docs/skin.pdf' },
         ],

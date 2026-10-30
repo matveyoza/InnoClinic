@@ -35,22 +35,29 @@ namespace Repository.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("DoctorAvatarUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)");
+
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DoctorName")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<string>("DoctorSpecialty")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("PatientName")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<int>("Room")
                         .HasColumnType("int");
@@ -65,7 +72,16 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Appointments");
+                    b.HasIndex("Date", "Time")
+                        .HasDatabaseName("IX_Appointments_Date_Time");
+
+                    b.HasIndex("DoctorId", "Date", "Time")
+                        .HasDatabaseName("IX_Appointments_DoctorId_Date_Time");
+
+                    b.HasIndex("PatientId", "Date", "Time")
+                        .HasDatabaseName("IX_Appointments_PatientId_Date_Time");
+
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Models.AppointmentDocument", b =>
@@ -79,8 +95,8 @@ namespace Repository.Migrations
 
                     b.Property<string>("DataType")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -93,9 +109,10 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentId");
+                    b.HasIndex("AppointmentId")
+                        .HasDatabaseName("IX_AppointmentDocuments_AppointmentId");
 
-                    b.ToTable("AppointmentDocuments");
+                    b.ToTable("AppointmentDocuments", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Models.AppointmentDocument", b =>

@@ -12,116 +12,126 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
-namespace Service
+namespace Service;
+
+public class AuthService : IAuthService
 {
-    public class AuthService : IAuthService
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly UserManager<User> _userManager;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthService> _logger;
+    private readonly IMapper _mapper;
+
+    public AuthService(
+        UserManager<User> userManager,
+        IHttpClientFactory httpClientFactory,
+        IConfiguration configuration,
+        ILogger<AuthService> logger,
+        IMapper mapper)
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly UserManager<User> _userManager;
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<AuthService> _logger;
-        private readonly IMapper _mapper;
+        _userManager = userManager;
+        _httpClientFactory = httpClientFactory;
+        _configuration = configuration;
+        _logger = logger;
+        _mapper = mapper;
+    }
 
-        public AuthService(
-            UserManager<User> userManager,
-            IHttpClientFactory httpClientFactory,
-            IConfiguration configuration,
-            ILogger<AuthService> logger,
-            IMapper mapper)
+    public async Task<bool> RegisterUserAsync(UserForRegistrationDto registerDto)
+    {
+        var user = _mapper.Map<User>(registerDto);
+        var result = await _userManager.CreateAsync(user, registerDto.Password);
+
+        if (!result.Succeeded)
         {
-            _userManager = userManager;
-            _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
-            _logger = logger;
-            _mapper = mapper;
+            _logger.LogError("Failed registration attempt for {Email}. Errors: {Errors}",
+                registerDto.Email,
+                string.Join(", ", result.Errors.Select(e => e.Description)));
+            return false;
         }
 
-        public async Task<bool> RegisterUserAsync(UserForRegistrationDto registerDto)
+        var assignedRole = string.IsNullOrWhiteSpace(registerDto.Role) ? "Patient" : registerDto.Role;
+        await _userManager.AddToRoleAsync(user, assignedRole);
+
+        var profileDto = _mapper.Map<UserProfileCreationDto>(registerDto);
+        profileDto.Id = user.Id;
+
+        var profileCreated = await CreateUserProfileAsync(profileDto);
+
+        if (!profileCreated)
         {
-            var user = _mapper.Map<User>(registerDto);
-            var result = await _userManager.CreateAsync(user, registerDto.Password);
-
-            if (!result.Succeeded)
-            {
-                _logger.LogError("Failed registration attempt. Backend/AuthService/Auth/Auth/Controllers/AuthController.cs Line: 44");
-
-                return false;
-            }
-
-            await _userManager.AddToRoleAsync(user, "Patient");
-
-            var profileDto = _mapper.Map<UserProfileCreationDto>(registerDto);
-            profileDto.Id = user.Id;
-
-            var profileCreated = await CreateUserProfileAsync(profileDto);
-
-            if (!profileCreated)
-            {
-                await _userManager.DeleteAsync(user);
-                _logger.LogError("User Profile Creation failed Backend/AuthService/Auth/Auth/Controllers/AuthController.cs Line: 62");
-                return false;
-            }
-
-            _logger.LogInformation("User successfully registered: {Email}", registerDto.Email);
-            return true;
+            await _userManager.DeleteAsync(user);
+            _logger.LogError("User profile creation failed for {Email}. Rolled back user {Id}.", registerDto.Email, user.Id);
+            return false;
         }
 
-        public async Task<User?> AuthenticateUserAsync(UserForAuthenticationDto userForAuth)
+        _logger.LogInformation("User successfully registered: {Email} with role {Role}", registerDto.Email, assignedRole);
+        return true;
+    }
+
+    public async Task<User?> AuthenticateUserAsync(UserForAuthenticationDto userForAuth)
+    {
+        var user = await _userManager.FindByEmailAsync(userForAuth.Email);
+
+        if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuth.Password))
+            return null;
+
+        return user;
+    }
+
+    public async Task<TokenDto> CreateTokenAsync(User user)
+    {
+        var jwtSettings = _configuration.GetSection("JwtSettings");
+        var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+        var validIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER");
+        var validAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE");
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var claims = new List<Claim>
         {
-            var user = await _userManager.FindByEmailAsync(userForAuth.Email);
+            new(ClaimTypes.NameIdentifier, user.Id),
+            new(ClaimTypes.Name, user.UserName ?? user.Email ?? string.Empty),
+            new(ClaimTypes.Email, user.Email ?? string.Empty),
+            new("sub", user.Id)
+        };
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuth.Password))
-                return null;
-
-            return user;
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim("role", role));
         }
 
-        public async Task<TokenDto> CreateTokenAsync(User user)
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var tokenOptions = new JwtSecurityToken(
+            issuer: validIssuer,
+            audience: validAudience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["expiresInMinutes"] ?? "1440")),
+            signingCredentials: credentials
+        );
+
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+        return new TokenDto { AccessToken = accessToken };
+    }
+
+    private async Task<bool> CreateUserProfileAsync(UserProfileCreationDto profileDto)
+    {
+        try
         {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
-            var validIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER");
-            var validAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE");
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user!.Id),
-                new Claim(ClaimTypes.Email, user.Email!)
-            };
-
-            var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var tokenOptions = new JwtSecurityToken(
-                issuer: validIssuer,
-                audience: validAudience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["expiresInMinutes"])),
-                signingCredentials: credentials
-            );
-
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-
-            return new TokenDto { AccessToken = accessToken };
-        }
-
-        private async Task<bool> CreateUserProfileAsync(UserProfileCreationDto profileDto)
-        {
-            var client = _httpClientFactory.CreateClient(AppConstants.UserServiceHttpClientName);
-
+            var client = _httpClientFactory.CreateClient("UserService");
             var jsonString = JsonSerializer.Serialize(profileDto);
-
-            var httpContent = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync($"{AppConstants.ApiRoute}/users/profile", httpContent);
-
             return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to connect to UserService when creating profile for {UserId}", profileDto.Id);
+            return false;
         }
     }
 }

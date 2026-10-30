@@ -4,8 +4,15 @@ namespace Entities.Contracts
 {
     public interface IAppointmentRepository
     {
-        Task<bool> CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken = default);
-        Task<IReadOnlyList<Appointment>> GetAllAppointmentsAsync(CancellationToken cancellationToken = default);
-        Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Appointment>> GetAppointmentsByRoleAsync(
+            Guid userId,
+            string role,
+            CancellationToken cancellationToken);
+
+        Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+
+        Task CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken);
+
+        Task DeleteAppointmentAsync(Appointment appointment, CancellationToken cancellationToken);
     }
 }

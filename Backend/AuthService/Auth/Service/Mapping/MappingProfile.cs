@@ -8,8 +8,12 @@ namespace Service.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<UserForRegistrationDto, User>();
-            CreateMap<UserForRegistrationDto, UserProfileCreationDto>();
+            CreateMap<UserForRegistrationDto, User>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName ?? src.Email))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+
+            CreateMap<UserForRegistrationDto, UserProfileCreationDto>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
         }
     }
 }

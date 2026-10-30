@@ -4,17 +4,16 @@
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        public Guid PatientId { get; set; }
         public string PatientName { get; set; } = string.Empty;
 
+        public Guid DoctorId { get; set; }
         public string DoctorName { get; set; } = string.Empty;
-
         public string DoctorSpecialty { get; set; } = string.Empty;
-
         public string? DoctorAvatarUrl { get; set; }
 
         public DateOnly Date { get; set; }
         public TimeOnly Time { get; set; }
-
         public int Room { get; set; }
 
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Upcoming;

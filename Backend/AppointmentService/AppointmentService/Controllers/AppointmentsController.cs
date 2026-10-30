@@ -1,52 +1,49 @@
-﻿using Service.Shared.DataTransferObjects;
-using Service.Contracts;
-using Microsoft.AspNetCore.Mvc;
+﻿using AppointmentPresentation.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Service.Contracts;
+using Service.Shared.Constants;
+using Service.Shared.DataTransferObjects;
 
-namespace AppointmentPresentation.AppointmentsController
+namespace AppointmentPresentation.Controllers;
+
+[ApiController]
+[Route("api/appointments")]
+[Authorize]
+public class AppointmentsController : ControllerBase
 {
-    [ApiController]
-    [Route("api/appointments")]
-    [Authorize]
-    public class AppointmentsController : ControllerBase
+    private readonly IAppointmentService _appointmentService;
+
+    public AppointmentsController(IAppointmentService appointmentService)
     {
-        private readonly IAppointmentService _appointmentService;
+        _appointmentService = appointmentService;
+    }
 
-        public AppointmentsController(IAppointmentService appointmentService)
-        {
-            _appointmentService = appointmentService;
-        }
+    [HttpGet]
+    [Authorize(Roles = $"{AppRoles.Patient},{AppRoles.Doctor},{AppRoles.Admin}")]
+    public async Task<IActionResult> GetAppointments(CancellationToken cancellationToken)
+    {
+        var appointments = await _appointmentService.GetAppointmentsAsync(
+            User.GetUserId(),
+            User.GetRole(),
+            cancellationToken);
 
+        return Ok(appointments);
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateAppointment([FromBody] AppointmentForCreationDto appointmentDto, CancellationToken cancellationToken)
-        {
-            var isCreated = await _appointmentService.CreateAppointmentAsync(appointmentDto, cancellationToken);
+    [HttpPost]
+    [Authorize(Roles = $"{AppRoles.Patient},{AppRoles.Admin}")]
+    public async Task<IActionResult> CreateAppointment(
+        [FromBody] AppointmentForCreationDto request,
+        CancellationToken cancellationToken)
+    {
+        var created = await _appointmentService.CreateAppointmentAsync(
+            User.GetUserId(),
+            User.GetRole(),
+            User.GetUserName(),
+            request,
+            cancellationToken);
 
-            if (!isCreated)
-                return BadRequest(new { message = "User profile creation failed." });
-
-            return Created();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllAppointments(CancellationToken cancellationToken)
-        {
-            var appointments = await _appointmentService.GetAllAppointmentsAsync(cancellationToken);
-            return Ok(appointments);
-        }
-
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetAppointmentById([FromRoute] Guid appointmentId, CancellationToken cancellationToken)
-        {
-            var appointment = await _appointmentService.GetAppointmentByIdAsync(appointmentId, cancellationToken);
-
-            if (appointment is null)
-            {
-                return NotFound(new { message = $"Appointment with ID '{appointmentId}' was not found." });
-            }
-
-            return Ok(appointment);
-        }
+        return Created();
     }
 }

@@ -5,6 +5,8 @@ namespace Service.Validators
 {
     public sealed class UserForRegistrationDtoValidator : AbstractValidator<UserForRegistrationDto>
     {
+        private static readonly string[] AllowedRoles = { "Patient", "Doctor", "Admin" };
+
         public UserForRegistrationDtoValidator()
         {
             RuleFor(x => x.Email)
@@ -24,6 +26,11 @@ namespace Service.Validators
             RuleFor(x => x.UserName)
                 .NotEmpty().WithMessage("User Name is required.")
                 .MaximumLength(50).WithMessage("Username cannot exceed 50 characters.");
+
+            RuleFor(x => x.Role)
+                .NotEmpty().WithMessage("Role is required.")
+                .Must(role => AllowedRoles.Contains(role))
+                .WithMessage("Role must be 'Patient', 'Doctor', or 'Admin'.");
         }
     }
 }

@@ -4,10 +4,7 @@ namespace Entities.Contracts
 {
     public interface IAppointmentRepository
     {
-        Task<IEnumerable<Appointment>> GetAppointmentsByRoleAsync(
-            Guid userId,
-            string role,
-            CancellationToken cancellationToken);
+        Task<IEnumerable<Appointment>> GetAppointmentsByRoleAsync(Guid userId, string role, CancellationToken cancellationToken);
 
         Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 

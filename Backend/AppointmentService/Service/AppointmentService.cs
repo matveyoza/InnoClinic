@@ -18,10 +18,7 @@ public class AppointmentService : IAppointmentService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<AppointmentDto>> GetAppointmentsAsync(
-        Guid userId,
-        string role,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<AppointmentDto>> GetAppointmentsAsync(Guid userId, string role, CancellationToken cancellationToken)
     {
         if (role != AppRoles.Patient && role != AppRoles.Doctor && role != AppRoles.Admin)
         {
@@ -32,11 +29,7 @@ public class AppointmentService : IAppointmentService
         return _mapper.Map<IEnumerable<AppointmentDto>>(appointments);
     }
 
-    public async Task<AppointmentDto> CreateAppointmentAsync(
-        Guid currentUserId,
-        string role,
-        string currentUserName,
-        AppointmentForCreationDto request,
+    public async Task<AppointmentDto> CreateAppointmentAsync(Guid currentUserId, string role, string currentUserName, AppointmentForCreationDto request,
         CancellationToken cancellationToken)
     {
         var appointment = _mapper.Map<Appointment>(request);
@@ -51,10 +44,6 @@ public class AppointmentService : IAppointmentService
                 break;
 
             case AppRoles.Admin:
-                if (request.PatientId == Guid.Empty)
-                {
-                    throw new ArgumentException("Admin must provide a valid PatientId.", nameof(request.PatientId));
-                }
                 appointment.PatientId = request.PatientId;
                 appointment.PatientName = request.PatientName;
                 break;

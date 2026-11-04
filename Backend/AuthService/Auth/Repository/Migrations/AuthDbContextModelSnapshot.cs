@@ -17,7 +17,7 @@ namespace Repository.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.15")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -112,6 +112,29 @@ namespace Repository.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "6cb8d370-318b-453b-91f8-97f41ffbcbe3",
+                            ConcurrencyStamp = "6cb8d370-318b-453b-91f8-97f41ffbcbe3",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "0456ca68-6e5f-494f-9874-224c2577ad03",
+                            ConcurrencyStamp = "0456ca68-6e5f-494f-9874-224c2577ad03",
+                            Name = "Doctor",
+                            NormalizedName = "DOCTOR"
+                        },
+                        new
+                        {
+                            Id = "d4d4bfcb-eaa1-49f7-92cc-e27a9be9fb7e",
+                            ConcurrencyStamp = "d4d4bfcb-eaa1-49f7-92cc-e27a9be9fb7e",
+                            Name = "Patient",
+                            NormalizedName = "PATIENT"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

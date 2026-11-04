@@ -1,6 +1,7 @@
 ﻿using Entities.Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Service.Shared.Constants;
 
 namespace Repository
 {
@@ -13,10 +14,7 @@ namespace Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Appointment>> GetAppointmentsByRoleAsync(
-            Guid userId,
-            string role,
-            CancellationToken cancellationToken)
+        public async Task<IEnumerable<Appointment>> GetAppointmentsByRoleAsync(Guid userId, string role, CancellationToken cancellationToken)
         {
             var query = _context.Appointments
                 .Include(a => a.Documents)
@@ -24,9 +22,9 @@ namespace Repository
 
             query = role switch
             {
-                "Patient" => query.Where(a => a.PatientId == userId),
-                "Doctor" => query.Where(a => a.DoctorId == userId),
-                "Admin" => query,
+                AppRoles.Patient => query.Where(a => a.PatientId == userId),
+                AppRoles.Doctor => query.Where(a => a.DoctorId == userId),
+                AppRoles.Admin => query,
                 _ => query.Where(_ => false)
             };
 
@@ -46,7 +44,7 @@ namespace Repository
 
         public async Task CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken)
         {
-            await _context.Appointments.AddAsync(appointment, cancellationToken);
+            _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync(cancellationToken);
         }
 

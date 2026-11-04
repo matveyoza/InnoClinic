@@ -23,10 +23,7 @@ public class AuthService : IAuthService
     private readonly IMapper _mapper;
 
     public AuthService(
-        UserManager<User> userManager,
-        IHttpClientFactory httpClientFactory,
-        IConfiguration configuration,
-        ILogger<AuthService> logger,
+        UserManager<User> userManager, IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AuthService> logger,
         IMapper mapper)
     {
         _userManager = userManager;

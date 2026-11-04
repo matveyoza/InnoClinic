@@ -23,26 +23,16 @@ public class AppointmentsController : ControllerBase
     [Authorize(Roles = $"{AppRoles.Patient},{AppRoles.Doctor},{AppRoles.Admin}")]
     public async Task<IActionResult> GetAppointments(CancellationToken cancellationToken)
     {
-        var appointments = await _appointmentService.GetAppointmentsAsync(
-            User.GetUserId(),
-            User.GetRole(),
-            cancellationToken);
+        var appointments = await _appointmentService.GetAppointmentsAsync(User.GetUserId(), User.GetRole(), cancellationToken);
 
         return Ok(appointments);
     }
 
     [HttpPost]
     [Authorize(Roles = $"{AppRoles.Patient},{AppRoles.Admin}")]
-    public async Task<IActionResult> CreateAppointment(
-        [FromBody] AppointmentForCreationDto request,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateAppointment([FromBody] AppointmentForCreationDto request, CancellationToken cancellationToken)
     {
-        var created = await _appointmentService.CreateAppointmentAsync(
-            User.GetUserId(),
-            User.GetRole(),
-            User.GetUserName(),
-            request,
-            cancellationToken);
+        var created = await _appointmentService.CreateAppointmentAsync(User.GetUserId(), User.GetRole(), User.GetUserName(), request, cancellationToken);
 
         return Created();
     }

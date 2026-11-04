@@ -5,8 +5,7 @@ namespace Repository
 {
     public class AppointmentDbContext : DbContext
     {
-        public AppointmentDbContext(DbContextOptions<AppointmentDbContext> options)
-            : base(options)
+        public AppointmentDbContext(DbContextOptions<AppointmentDbContext> options) : base(options)
         {
         }
 

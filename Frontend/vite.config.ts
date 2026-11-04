@@ -23,6 +23,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/api/appointments': {
+        target: 'https://localhost:7139',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

@@ -1,10 +1,14 @@
-import { useRef } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MdClose, MdAttachFile, MdDeleteOutline, MdDescription } from "react-icons/md";
+import axios from "axios";
+import { MdClose } from "react-icons/md";
 import { AppointmentStatus } from "../../types/enums/appointmentStatus";
 import type { Appointment } from "../../types/appointment";
+import { appointmentApi } from "../../api/axios";
+import { FormField } from "./FormField";
+import { ClinicalDocumentsSection } from "./ClinicalDocumentsSection";
 
 const appointmentDocumentSchema = z.object({
   id: z.string(),
@@ -20,11 +24,7 @@ const createAppointmentSchema = z.object({
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
   room: z.number().min(1, "Room number must be greater than 0"),
-  status: z.enum([
-  AppointmentStatus.Upcoming,
-  AppointmentStatus.Completed,
-  AppointmentStatus.Cancelled,
-]),
+  status: z.nativeEnum(AppointmentStatus),
   documents: z.array(appointmentDocumentSchema),
 });
 
@@ -33,11 +33,12 @@ type CreateAppointmentInputs = z.infer<typeof createAppointmentSchema>;
 interface CreateAppointmentTabProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (appointment: Omit<Appointment, "id">) => void;
+  onAppointmentCreated: (createdAppointment: Appointment) => void;
 }
 
-export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointmentTabProps) => {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+export const CreateAppointmentTab = ({isOpen, onClose, onAppointmentCreated }: CreateAppointmentTabProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -62,43 +63,60 @@ export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointm
 
   const documents = watch("documents");
 
-  if (!isOpen) return null;
+  if (!isOpen)
+    return null;
 
-  const handleFileUpload = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-
-    const newDocs = Array.from(files).map((file) => ({
-      id: crypto.randomUUID(),
-      name: file.name,
-      dataType: file.type || "application/octet-stream",
-      fileUrl: URL.createObjectURL(file),
-    }));
-
-    setValue("documents", [...documents, ...newDocs]);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const handleRemoveDoc = (id: string) => {
-    setValue(
-      "documents",
-      documents.filter((doc) => doc.id !== id)
-    );
-  };
-
-  const submitAppointment = (data: CreateAppointmentInputs) => {
-    onSave({
-      ...data,
-      documents: data.documents.length > 0 ? data.documents : undefined,
-    });
+  const handleClose = () => {
+    if (isSubmitting)
+      return;
+    setError(null);
     reset();
     onClose();
+  };
+
+  const submitAppointment = async (data: CreateAppointmentInputs) => {
+    setIsSubmitting(true);
+    setError(null);
+
+    const payload = {
+      doctorName: data.doctorName,
+      doctorSpecialty: data.doctorSpecialty,
+      doctorAvatarUrl: data.doctorAvatarUrl || null,
+      date: data.date,
+      time: data.time.length === 5 ? `${data.time}:00` : data.time,
+      room: data.room,
+      status: data.status,
+      documents: data.documents.map((d) => ({
+        name: d.name,
+        type: d.dataType,
+        url: d.fileUrl,
+      })),
+    };
+
+    try {
+      const response = await appointmentApi.post<Appointment>("/", payload);
+
+      onAppointmentCreated(response.data);
+      reset();
+      onClose();
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to create appointment.");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred while saving.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       <aside className="relative w-full max-w-lg max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col z-10 overflow-hidden">
@@ -109,106 +127,63 @@ export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointm
           </div>
           <button
             type="button"
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+            onClick={handleClose}
+            disabled={isSubmitting}
+            className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
           >
             <MdClose className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit(submitAppointment)} className="flex-1 overflow-y-auto p-6 space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-              Doctor Name
-            </label>
-            <input
-              placeholder="e.g. Dr. Sarah Jenkins"
-              className={`w-full px-3.5 py-2 text-sm border rounded-lg transition-all ${
-                errors.doctorName
-                  ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                  : "border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-              }`}
-              {...register("doctorName")}
+          {error && (
+            <div className="p-3 text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <FormField
+            label="Doctor Name"
+            placeholder="e.g. Dr. Sarah Jenkins"
+            disabled={isSubmitting}
+            registration={register("doctorName")}
+            error={errors.doctorName}
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              label="Specialty"
+              placeholder="e.g. Cardiologist"
+              disabled={isSubmitting}
+              registration={register("doctorSpecialty")}
+              error={errors.doctorSpecialty}
             />
-            {errors.doctorName && (
-              <p className="text-red-500 text-xs font-medium mt-1">{errors.doctorName.message}</p>
-            )}
+
+            <FormField
+              label="Room Number"
+              type="number"
+              disabled={isSubmitting}
+              registration={register("room", { valueAsNumber: true })}
+              error={errors.room}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-                Specialty
-              </label>
-              <input
-                placeholder="e.g. Cardiologist"
-                className={`w-full px-3.5 py-2 text-sm border rounded-lg transition-all ${
-                  errors.doctorSpecialty
-                    ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                    : "border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                }`}
-                {...register("doctorSpecialty")}
-              />
-              {errors.doctorSpecialty && (
-                <p className="text-red-500 text-xs font-medium mt-1">{errors.doctorSpecialty.message}</p>
-              )}
-            </div>
+            <FormField
+              label="Date"
+              type="date"
+              disabled={isSubmitting}
+              registration={register("date")}
+              error={errors.date}
+            />
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-                Room Number
-              </label>
-              <input
-                type="number"
-                className={`w-full px-3.5 py-2 text-sm border rounded-lg transition-all ${
-                  errors.room
-                    ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                    : "border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                }`}
-                {...register("room", { valueAsNumber: true })}
-              />
-              {errors.room && (
-                <p className="text-red-500 text-xs font-medium mt-1">{errors.room.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-                Date
-              </label>
-              <input
-                type="date"
-                className={`w-full px-3.5 py-2 text-sm border rounded-lg transition-all ${
-                  errors.date
-                    ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                    : "border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                }`}
-                {...register("date")}
-              />
-              {errors.date && (
-                <p className="text-red-500 text-xs font-medium mt-1">{errors.date.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-                Time
-              </label>
-              <input
-                type="time"
-                className={`w-full px-3.5 py-2 text-sm border rounded-lg transition-all ${
-                  errors.time
-                    ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                    : "border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                }`}
-                {...register("time")}
-              />
-              {errors.time && (
-                <p className="text-red-500 text-xs font-medium mt-1">{errors.time.message}</p>
-              )}
-            </div>
+            <FormField
+              label="Time"
+              type="time"
+              disabled={isSubmitting}
+              registration={register("time")}
+              error={errors.time}
+            />
           </div>
 
           <div>
@@ -216,7 +191,8 @@ export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointm
               Initial Status
             </label>
             <select
-              className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-white"
+              disabled={isSubmitting}
+              className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-white disabled:bg-slate-50"
               {...register("status")}
             >
               <option value={AppointmentStatus.Upcoming}>Upcoming</option>
@@ -225,68 +201,27 @@ export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointm
             </select>
           </div>
 
-          <div className="pt-2 border-t border-slate-100">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-semibold text-slate-600 uppercase">
-                Clinical Documents
-              </label>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100/70 px-2.5 py-1.5 rounded-md transition-colors cursor-pointer"
-              >
-                <MdAttachFile className="w-4 h-4" />
-                Attach Doc
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="hidden"
-                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xml"
-                onChange={(e) => handleFileUpload(e.target.files)}
-              />
-            </div>
-
-            {documents.length > 0 ? (
-              <ul className="space-y-2 mt-2">
-                {documents.map((doc) => (
-                  <li
-                    key={doc.id}
-                    className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700"
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <MdDescription className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="truncate font-medium">{doc.name}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveDoc(doc.id)}
-                      className="text-slate-400 hover:text-rose-500 p-1 transition-colors cursor-pointer"
-                    >
-                      <MdDeleteOutline className="w-4 h-4" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-xs text-slate-400 italic">No files attached yet.</p>
-            )}
-          </div>
+          <ClinicalDocumentsSection
+            documents={documents}
+            disabled={isSubmitting}
+            onChange={(updatedDocs) => setValue("documents", updatedDocs, { shouldValidate: true })}
+          />
 
           <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors cursor-pointer"
+              disabled={isSubmitting}
+              className="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save Appointment
+              {isSubmitting ? "Saving..." : "Save Appointment"}
             </button>
           </div>
         </form>

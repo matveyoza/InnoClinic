@@ -46,18 +46,14 @@ const initialAppointments: Appointment[] = [
 export const MainPage = () => {
   const user = useUserStore((state) => state.user);
   const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
-  const [isTabOpen, setIsTabOpen] = useState(false);
+  const [isCreateAppointmentTabOpen, setIsCreateAppointmentTabOpen] = useState(false);
 
   const upcomingCount = appointments.filter(
     (app) => app.status === AppointmentStatus.Upcoming
   ).length;
 
-  const handleCreateAppointment = (newApp: Omit<Appointment, 'id'>) => {
-    const createdAppointment: Appointment = {
-      ...newApp,
-      id: crypto.randomUUID(),
-    };
-    setAppointments((prev) => [createdAppointment, ...prev]);
+  const handleAppointmentCreated = (newAppointment: Appointment) => {
+    setAppointments((prev) => [newAppointment, ...prev]);
   };
 
   return (
@@ -72,7 +68,7 @@ export const MainPage = () => {
 
           <button
             type="button"
-            onClick={() => setIsTabOpen(true)}
+            onClick={() => setIsCreateAppointmentTabOpen(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             Create Appointment
@@ -102,9 +98,9 @@ export const MainPage = () => {
       </div>
 
       <CreateAppointmentTab
-        isOpen={isTabOpen}
-        onClose={() => setIsTabOpen(false)}
-        onSave={handleCreateAppointment}
+        isOpen={isCreateAppointmentTabOpen}
+        onClose={() => setIsCreateAppointmentTabOpen(false)}
+        onAppointmentCreated={handleAppointmentCreated}
       />
     </Layout>
   );

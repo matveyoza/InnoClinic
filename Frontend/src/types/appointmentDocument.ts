@@ -1,6 +1,6 @@
 export interface AppointmentDocument {
     id: string;
     name: string;
-    type: string;
+    dataType: string;
     fileUrl: string;
 }

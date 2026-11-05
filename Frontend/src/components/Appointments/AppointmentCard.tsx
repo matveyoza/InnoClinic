@@ -109,7 +109,7 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
                             </div>
                             <div>
                                 <h4 className="text-base font-bold text-slate-800">{selectedDoc.name}</h4>
-                                <p className="text-xs text-slate-400">{selectedDoc.type} Document</p>
+                                <p className="text-xs text-slate-400">{selectedDoc.dataType} Document</p>
                             </div>
                         </div>
 

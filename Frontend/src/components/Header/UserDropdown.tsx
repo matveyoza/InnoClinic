@@ -12,6 +12,10 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
+    const displayRole = Array.isArray(user?.role) 
+        ? user.role.join(', ') 
+        : (user?.role ?? 'Guest');
+
     const handleOpenSettings = () => {
         setIsOpen(false);
         setIsSettingsOpen(true);
@@ -38,7 +42,7 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
                     <div className="absolute right-0 top-full bg-white shadow-lg rounded-lg p-3 w-40 border border-slate-100 z-20">
                         <div className="mb-1">
                             <strong className="block text-slate-800 text-sm">{user?.userName}</strong>
-                            <small className="block text-slate-500 text-xs">{user?.email}</small>
+                            <small className="block text-slate-500 text-xs">{displayRole}</small>
                         </div>
 
                         <hr className="my-2 border-slate-100" />

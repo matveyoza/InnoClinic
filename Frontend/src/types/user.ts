@@ -1,3 +1,5 @@
+export type UserRole = "Admin" | "Doctor" | "Patient";
+
 export interface User {
     id: string;
     email: string;
@@ -5,4 +7,5 @@ export interface User {
     firstName?: string;
     lastName?: string;
     avatarUrl?: string;
+    role: UserRole;
 }

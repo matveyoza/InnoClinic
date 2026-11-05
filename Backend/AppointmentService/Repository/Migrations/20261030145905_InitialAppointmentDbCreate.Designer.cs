@@ -12,8 +12,8 @@ using Repository;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AppointmentDbContext))]
-    [Migration("20261027142026_refactor")]
-    partial class refactor
+    [Migration("20261030145905_InitialAppointmentDbCreate")]
+    partial class InitialAppointmentDbCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,48 +31,60 @@ namespace Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Cabinet")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<DateOnly>("Date")
-                        .HasMaxLength(50)
                         .HasColumnType("date");
 
                     b.Property<string>("DoctorAvatarUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)");
+
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DoctorName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<string>("DoctorSpecialty")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("PatientName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<int>("Room")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<TimeOnly>("Time")
-                        .HasMaxLength(50)
                         .HasColumnType("time");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Appointments");
+                    b.HasIndex("Date", "Time")
+                        .HasDatabaseName("IX_Appointments_Date_Time");
+
+                    b.HasIndex("DoctorId", "Date", "Time")
+                        .HasDatabaseName("IX_Appointments_DoctorId_Date_Time");
+
+                    b.HasIndex("PatientId", "Date", "Time")
+                        .HasDatabaseName("IX_Appointments_PatientId_Date_Time");
+
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Models.AppointmentDocument", b =>
@@ -84,15 +96,15 @@ namespace Repository.Migrations
                     b.Property<Guid>("AppointmentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("DataType")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<string>("Url")
                         .HasMaxLength(2083)
@@ -100,9 +112,10 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentId");
+                    b.HasIndex("AppointmentId")
+                        .HasDatabaseName("IX_AppointmentDocuments_AppointmentId");
 
-                    b.ToTable("AppointmentDocuments");
+                    b.ToTable("AppointmentDocuments", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Models.AppointmentDocument", b =>

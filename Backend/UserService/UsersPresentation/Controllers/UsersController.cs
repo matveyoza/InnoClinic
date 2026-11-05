@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
+using Service.Shared.DataTransferObjects.Service.Shared.DataTransferObjects;
 using System.Security.Claims;
 
 namespace UsersPresentation.Controllers
@@ -9,12 +11,16 @@ namespace UsersPresentation.Controllers
     [Route("api/users")]
     [ApiController]
     [Authorize]
-    public class InternalUsersController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public InternalUsersController(IUserService userService, ILogger<InternalUsersController> logger) =>
+        public UsersController(IUserService userService, ILogger<UsersController> logger, IMapper mapper)
+        {
             _userService = userService;
+            _mapper = mapper;
+        }
 
         [HttpGet("current", Name = "GetCurrentUser")]
         public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
@@ -33,10 +39,16 @@ namespace UsersPresentation.Controllers
                 return NotFound(new { error = result.Error.Code, message = result.Error.Message });
             }
 
-            return Ok(result.Value);
+            var currentUser = _mapper.Map<CurrentUserDto>(result.Value);
+            currentUser.Role = User.FindFirstValue(ClaimTypes.Role)
+                               ?? User.FindFirst("role")?.Value
+                               ?? string.Empty;
+
+            return Ok(currentUser);
         }
 
         [HttpGet(Name = "GetUsers")]
+        [Authorize(Roles = "Admin,Doctor")]
         public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
         {
             var users = await _userService.GetUsersAsync(cancellationToken);
@@ -44,6 +56,7 @@ namespace UsersPresentation.Controllers
         }
 
         [HttpGet("{id:guid}", Name = "UserById")]
+        [Authorize(Roles = "Admin,Doctor")]
         public async Task<IActionResult> GetUser(Guid id, CancellationToken cancellationToken)
         {
             var result = await _userService.GetUserByIdAsync(id, cancellationToken);
@@ -71,6 +84,7 @@ namespace UsersPresentation.Controllers
         }
 
         [HttpDelete("profile")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUserAsync([FromBody] Guid id)
         {
             var result = await _userService.DeleteUserAsync(id);

@@ -1,45 +1,60 @@
-﻿using Service.Shared.DataTransferObjects;
-using AutoMapper;
+﻿using AutoMapper;
 using Entities.Contracts;
 using Entities.Models;
 using Service.Contracts;
-using FluentValidation;
+using Service.Shared.Constants;
+using Service.Shared.DataTransferObjects;
 
-namespace Service
+namespace Service;
+
+public class AppointmentService : IAppointmentService
 {
-    public class AppointmentService : IAppointmentService
+    private readonly IAppointmentRepository _repository;
+    private readonly IMapper _mapper;
+
+    public AppointmentService(IAppointmentRepository repository, IMapper mapper)
     {
-        private readonly IAppointmentRepository _repository;
-        private readonly IMapper _mapper;
-        
+        _repository = repository;
+        _mapper = mapper;
+    }
 
-        public AppointmentService(IAppointmentRepository repository, IMapper mapper)
+    public async Task<IEnumerable<AppointmentDto>> GetAppointmentsAsync(Guid userId, string role, CancellationToken cancellationToken)
+    {
+        var appointments = await _repository.GetAppointmentsByRoleAsync(userId, role, cancellationToken);
+        return _mapper.Map<IEnumerable<AppointmentDto>>(appointments);
+    }
+
+    public async Task<AppointmentDto> CreateAppointmentAsync(Guid currentUserId, string role, string currentUserName, AppointmentForCreationDto request,
+        CancellationToken cancellationToken)
+    {
+        var appointment = _mapper.Map<Appointment>(request);
+
+        switch (role)
         {
-            _repository = repository;
-            _mapper = mapper;
+            case AppRoles.Patient:
+                appointment.PatientId = currentUserId;
+                appointment.PatientName = !string.IsNullOrWhiteSpace(currentUserName)
+                    ? currentUserName
+                    : request.PatientName;
+                break;
+
+            case AppRoles.Admin:
+                appointment.PatientId = request.PatientId;
+                appointment.PatientName = request.PatientName;
+                break;
+
+            case AppRoles.Doctor:
+                throw new UnauthorizedAccessException("Doctors are not allowed to create appointments.");
+
+            default:
+                throw new UnauthorizedAccessException("Invalid role.");
         }
 
-        public async Task<bool> CreateAppointmentAsync(AppointmentForCreationDto appointmentForCreationDto, CancellationToken cancellationToken = default)
-        {
-            var appointment = _mapper.Map<Appointment>(appointmentForCreationDto);
+        appointment.Status = AppointmentStatus.Upcoming;
+        appointment.CreatedAtUtc = DateTime.UtcNow;
 
-            var isCreated = await _repository.CreateAppointmentAsync(appointment, cancellationToken);
+        await _repository.CreateAppointmentAsync(appointment, cancellationToken);
 
-            return isCreated;
-        }
-
-        public async Task<IReadOnlyList<AppointmentDto>> GetAllAppointmentsAsync(CancellationToken cancellationToken = default)
-        {
-            var appointments = await _repository.GetAllAppointmentsAsync(cancellationToken);
-
-            return _mapper.Map<IReadOnlyList<AppointmentDto>>(appointments);
-        }
-
-        public async Task<AppointmentDto?> GetAppointmentByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default)
-        {
-            var appointment = await _repository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
-
-            return _mapper.Map<AppointmentDto>(appointment);
-        }
+        return _mapper.Map<AppointmentDto>(appointment);
     }
 }

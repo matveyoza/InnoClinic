@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Entities.Models;
+using Entities.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
-using Entities.Shared;
 
 namespace Service
 {
@@ -57,7 +57,8 @@ namespace Service
 
             if (!result.Succeeded)
             {
-                _logger.LogInformation($"Failed profile creation for ID {user.Id}.");
+                var errors = string.Join(", ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
+                _logger.LogError("Failed profile creation for ID {UserId}. Errors: {Errors}", user.Id, errors);
                 return false;
             }
 

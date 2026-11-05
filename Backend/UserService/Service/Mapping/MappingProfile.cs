@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Entities.Models;
 using Service.Shared.DataTransferObjects;
+using Service.Shared.DataTransferObjects.Service.Shared.DataTransferObjects;
 
 namespace Service.Mapping
 {
@@ -10,6 +11,7 @@ namespace Service.Mapping
         {
             CreateMap<UserProfileDto, User>();
             CreateMap<User, UserDto>();
+            CreateMap<UserDto, CurrentUserDto>();
         }
     }
 }

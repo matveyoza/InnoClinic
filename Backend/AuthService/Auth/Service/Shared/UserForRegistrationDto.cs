@@ -1,4 +1,6 @@
-﻿namespace Service.Shared
+﻿using Service.Constants;
+
+namespace Service.Shared
 {
     public sealed record UserForRegistrationDto
     {
@@ -7,5 +9,6 @@
         public string? FirstName { get; init; }
         public string? LastName { get; init; }
         public string? UserName { get; init; }
+        public string Role { get; init; } = AppRoles.Patient;
     }
 }

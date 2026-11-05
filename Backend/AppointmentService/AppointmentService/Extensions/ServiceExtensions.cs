@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service;
 using Service.Contracts;
+using System.Security.Claims;
 using System.Text;
 
 namespace AppointmentPresentation.Extensions
@@ -46,7 +47,9 @@ namespace AppointmentPresentation.Extensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = validIssuer,
                     ValidAudience = validAudience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
+
+                    RoleClaimType = ClaimTypes.Role
                 };
                 options.Events = new JwtBearerEvents
                 {

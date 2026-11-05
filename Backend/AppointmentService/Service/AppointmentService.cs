@@ -20,11 +20,6 @@ public class AppointmentService : IAppointmentService
 
     public async Task<IEnumerable<AppointmentDto>> GetAppointmentsAsync(Guid userId, string role, CancellationToken cancellationToken)
     {
-        if (role != AppRoles.Patient && role != AppRoles.Doctor && role != AppRoles.Admin)
-        {
-            return Enumerable.Empty<AppointmentDto>();
-        }
-
         var appointments = await _repository.GetAppointmentsByRoleAsync(userId, role, cancellationToken);
         return _mapper.Map<IEnumerable<AppointmentDto>>(appointments);
     }

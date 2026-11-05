@@ -22,8 +22,7 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IMapper _mapper;
 
-    public AuthService(
-        UserManager<User> userManager, IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AuthService> logger,
+    public AuthService(UserManager<User> userManager, IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AuthService> logger,
         IMapper mapper)
     {
         _userManager = userManager;
@@ -94,7 +93,6 @@ public class AuthService : IAuthService
 
         foreach (var role in roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
             claims.Add(new Claim("role", role));
         }
 

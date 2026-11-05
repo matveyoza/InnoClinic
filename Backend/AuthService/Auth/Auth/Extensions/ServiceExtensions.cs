@@ -75,7 +75,7 @@ namespace AuthPresentation.Extensions
                     ValidAudience = validAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
 
-                    RoleClaimType = ClaimTypes.Role
+                    RoleClaimType = "role",
                 };
                 options.Events = new JwtBearerEvents
                 {

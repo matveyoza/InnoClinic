@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { MdAttachFile, MdDeleteOutline, MdDescription } from "react-icons/md";
 
-export interface DocumentItem {
+interface DocumentItem {
   id: string;
   name: string;
   dataType: string;
@@ -14,11 +14,7 @@ interface ClinicalDocumentsSectionProps {
   disabled?: boolean;
 }
 
-export const ClinicalDocumentsSection = ({
-  documents,
-  onChange,
-  disabled = false,
-}: ClinicalDocumentsSectionProps) => {
+export const ClinicalDocumentsSection = ({documents, onChange, disabled = false}: ClinicalDocumentsSectionProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileUpload = (files: FileList | null) => {

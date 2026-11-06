@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service.Constants;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
@@ -41,7 +42,9 @@ namespace Backend.Extensions
             var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
             var validIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER");
             var validAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE");
-
+            
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -60,7 +63,8 @@ namespace Backend.Extensions
                     ValidAudience = validAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
 
-                    RoleClaimType = ClaimTypes.Role
+                    RoleClaimType = "role",
+                    NameClaimType = ClaimTypes.NameIdentifier
                 };
                 options.Events = new JwtBearerEvents
                 {

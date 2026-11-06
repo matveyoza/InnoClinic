@@ -25,7 +25,7 @@ namespace UsersPresentation.Controllers
         [HttpGet("current", Name = "GetCurrentUser")]
         public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdClaim = User.FindFirst("sub")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
@@ -40,9 +40,9 @@ namespace UsersPresentation.Controllers
             }
 
             var currentUser = _mapper.Map<CurrentUserDto>(result.Value);
-            currentUser.Role = User.FindFirstValue(ClaimTypes.Role)
-                               ?? User.FindFirst("role")?.Value
-                               ?? string.Empty;
+
+            var roles = User.FindAll("role").Select(c => c.Value).ToList();
+            currentUser.Role = roles.Count > 0 ? string.Join(", ", roles) : string.Empty;
 
             return Ok(currentUser);
         }

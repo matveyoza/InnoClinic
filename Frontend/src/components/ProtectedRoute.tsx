@@ -20,6 +20,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
     useEffect(() => {
         if (isAuthenticated && user) {
+            setLoading(false);
             return;
         }
 

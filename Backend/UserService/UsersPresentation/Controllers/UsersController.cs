@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
+using Service.Shared.Constants;
 using Service.Shared.DataTransferObjects;
-using Service.Shared.DataTransferObjects.Service.Shared.DataTransferObjects;
 using System.Security.Claims;
 
 namespace UsersPresentation.Controllers
@@ -23,32 +23,30 @@ namespace UsersPresentation.Controllers
         }
 
         [HttpGet("current", Name = "GetCurrentUser")]
+        [Authorize]
         public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdClaim = User.FindFirst("sub")?.Value;
 
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
                 return Unauthorized(new { message = "Invalid or missing user ID claim in token." });
             }
 
-            var result = await _userService.GetUserByIdAsync(userId, cancellationToken);
+            var currentUser = await _userService.GetUserByIdAsync(userId, cancellationToken);
 
-            if (!result.IsSuccess)
+            if (currentUser is null)
             {
-                return NotFound(new { error = result.Error.Code, message = result.Error.Message });
+                return NotFound(new { message = "User not found." });
             }
 
-            var currentUser = _mapper.Map<CurrentUserDto>(result.Value);
-            currentUser.Role = User.FindFirstValue(ClaimTypes.Role)
-                               ?? User.FindFirst("role")?.Value
-                               ?? string.Empty;
+            currentUser.Role = User.FindAll("role").Select(c => c.Value).ToArray();
 
             return Ok(currentUser);
         }
 
         [HttpGet(Name = "GetUsers")]
-        [Authorize(Roles = "Admin,Doctor")]
+        [Authorize(Roles = $"{AppRoles.Doctor},{AppRoles.Admin}")]
         public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
         {
             var users = await _userService.GetUsersAsync(cancellationToken);
@@ -56,17 +54,17 @@ namespace UsersPresentation.Controllers
         }
 
         [HttpGet("{id:guid}", Name = "UserById")]
-        [Authorize(Roles = "Admin,Doctor")]
+        [Authorize(Roles = $"{AppRoles.Doctor},{AppRoles.Admin}")]
         public async Task<IActionResult> GetUser(Guid id, CancellationToken cancellationToken)
         {
-            var result = await _userService.GetUserByIdAsync(id, cancellationToken);
+            var user = await _userService.GetUserByIdAsync(id, cancellationToken);
 
-            if (!result.IsSuccess)
+            if (user is null)
             {
-                return NotFound(new { error = result.Error.Code, message = result.Error.Message });
+                return NotFound(new { message = "User not found." });
             }
 
-            return Ok(result.Value);
+            return Ok(user);
         }
 
         [AllowAnonymous]
@@ -84,7 +82,7 @@ namespace UsersPresentation.Controllers
         }
 
         [HttpDelete("profile")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = $"{AppRoles.Admin}")]
         public async Task<IActionResult> DeleteUserAsync([FromBody] Guid id)
         {
             var result = await _userService.DeleteUserAsync(id);

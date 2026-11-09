@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service.Constants;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
@@ -58,6 +59,8 @@ namespace AuthPresentation.Extensions
                 throw new InvalidOperationException("JWT Secret Key is missing from the environment variables.");
             }
 
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -76,6 +79,7 @@ namespace AuthPresentation.Extensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
 
                     RoleClaimType = "role",
+                    NameClaimType = "sub"
                 };
                 options.Events = new JwtBearerEvents
                 {

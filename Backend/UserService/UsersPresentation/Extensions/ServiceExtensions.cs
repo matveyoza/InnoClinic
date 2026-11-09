@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service.Constants;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
@@ -31,9 +32,17 @@ namespace Backend.Extensions
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<UserDbContext>()
-                .AddDefaultTokenProviders();
+            services.AddIdentityCore<User>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 8;
+            })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<UserDbContext>()
+            .AddDefaultTokenProviders();
         }
 
         public static void ConfigureJwt(this IServiceCollection services)
@@ -41,7 +50,9 @@ namespace Backend.Extensions
             var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
             var validIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER");
             var validAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE");
-
+            
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,8 +61,10 @@ namespace Backend.Extensions
             })
             .AddJwtBearer(options =>
             {
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
+
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
@@ -60,7 +73,8 @@ namespace Backend.Extensions
                     ValidAudience = validAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
 
-                    RoleClaimType = ClaimTypes.Role
+                    RoleClaimType = "role",
+                    NameClaimType = "sub"
                 };
                 options.Events = new JwtBearerEvents
                 {

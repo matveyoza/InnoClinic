@@ -30,6 +30,7 @@ export const LogInPage = () => {
     const setIsAuthenticated = useAuthStore(state => state.setIsAuthenticated);
     const setUser = useUserStore(state => state.setUser);
     const navigate = useNavigate();
+    const setLoading = useAuthStore(state => state.setLoading);
 
     const {
         register,
@@ -55,6 +56,7 @@ export const LogInPage = () => {
 
             setUser(response.data);
             setIsAuthenticated(true);
+            setLoading(false);
             navigate("/main");
         } catch (err) {
             if (axios.isAxiosError(err)) {

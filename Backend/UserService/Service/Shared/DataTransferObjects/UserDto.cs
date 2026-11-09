@@ -7,6 +7,6 @@
         public string? LastName { get; init; }
         public string UserName { get; init; } = string.Empty;
         public string Email { get; init; } = string.Empty;
-        public List<string> Role { get; set; } = [];
+        public string[] Role { get; set; } = Array.Empty<string>();
     }
 }

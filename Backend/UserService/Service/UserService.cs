@@ -33,20 +33,18 @@ namespace Service
             return _mapper.Map<IEnumerable<UserDto>>(users);
         }
 
-        public async Task<Result<UserDto>> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<UserDto?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             var user = await _userManager.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == id.ToString(), cancellationToken);
 
             if (user is null)
-            {
-                return Result.Failure<UserDto>(new Error("User.NotFound", $"User with ID {id} was not found."));
-            }
+                return null;
 
             var userDto = _mapper.Map<UserDto>(user);
 
-            return Result.Success(userDto);
+            return userDto;
         }
 
         public async Task<bool> CreateUserProfileAsync(UserProfileDto profileDto)

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service;
 using Service.Contracts;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
@@ -31,6 +32,8 @@ namespace AppointmentPresentation.Extensions
             var validIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER");
             var validAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE");
 
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -39,6 +42,7 @@ namespace AppointmentPresentation.Extensions
             })
             .AddJwtBearer(options =>
             {
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -49,7 +53,8 @@ namespace AppointmentPresentation.Extensions
                     ValidAudience = validAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
 
-                    RoleClaimType = ClaimTypes.Role
+                    RoleClaimType = "role",
+                    NameClaimType = "sub"
                 };
                 options.Events = new JwtBearerEvents
                 {

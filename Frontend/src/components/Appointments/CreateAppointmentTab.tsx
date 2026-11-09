@@ -5,6 +5,7 @@ import { z } from "zod";
 import { MdClose, MdAttachFile, MdDeleteOutline, MdDescription } from "react-icons/md";
 import { AppointmentStatus } from "../../types/enums/appointmentStatus";
 import type { Appointment } from "../../types/appointment";
+import { useUserStore } from "../../store/useUserStore";
 
 const appointmentDocumentSchema = z.object({
   id: z.string(),
@@ -14,17 +15,18 @@ const appointmentDocumentSchema = z.object({
 });
 
 const createAppointmentSchema = z.object({
+  doctorId: z.string().uuid("Must be a valid UUID"),
   doctorName: z.string().min(1, "Doctor name is required"),
   doctorSpecialty: z.string().min(1, "Specialty is required"),
-  doctorAvatarUrl: z.string().url("Must be a valid URL").or(z.literal("")),
+  doctorAvatarUrl: z.string().url("Must be a valid URL").or(z.literal("")).optional(),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
   room: z.number().min(1, "Room number must be greater than 0"),
   status: z.enum([
-  AppointmentStatus.Upcoming,
-  AppointmentStatus.Completed,
-  AppointmentStatus.Cancelled,
-]),
+    AppointmentStatus.Upcoming,
+    AppointmentStatus.Completed,
+    AppointmentStatus.Cancelled,
+  ]),
   documents: z.array(appointmentDocumentSchema),
 });
 
@@ -37,6 +39,7 @@ interface CreateAppointmentTabProps {
 }
 
 export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointmentTabProps) => {
+  const user = useUserStore((state) => state.user);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
@@ -49,6 +52,7 @@ export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointm
   } = useForm<CreateAppointmentInputs>({
     resolver: zodResolver(createAppointmentSchema),
     defaultValues: {
+      doctorId: "00000000-0000-0000-0000-000000000000",
       doctorName: "",
       doctorSpecialty: "",
       doctorAvatarUrl: "",
@@ -86,10 +90,21 @@ export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointm
   };
 
   const submitAppointment = (data: CreateAppointmentInputs) => {
+    // Fulfill all required fields of Omit<Appointment, "id">
     onSave({
-      ...data,
+      patientId: user?.id ?? "00000000-0000-0000-0000-000000000000",
+      patientName: user?.userName || user?.email || "Unknown Patient",
+      doctorId: data.doctorId,
+      doctorName: data.doctorName,
+      doctorSpecialty: data.doctorSpecialty,
+      doctorAvatarUrl: data.doctorAvatarUrl || null,
+      date: data.date,
+      time: data.time,
+      room: data.room,
+      status: data.status,
       documents: data.documents.length > 0 ? data.documents : undefined,
     });
+
     reset();
     onClose();
   };

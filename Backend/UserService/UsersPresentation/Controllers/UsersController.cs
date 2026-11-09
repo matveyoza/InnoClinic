@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
-using Service.Shared.DataTransferObjects.Service.Shared.DataTransferObjects;
 using System.Security.Claims;
 
 namespace UsersPresentation.Controllers
@@ -23,9 +22,10 @@ namespace UsersPresentation.Controllers
         }
 
         [HttpGet("current", Name = "GetCurrentUser")]
+        [Authorize(Roles = "Admin,Doctor,Patient")]
         public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
         {
-            var userIdClaim = User.FindFirst("sub")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst("sub")?.Value;
 
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
@@ -39,10 +39,9 @@ namespace UsersPresentation.Controllers
                 return NotFound(new { error = result.Error.Code, message = result.Error.Message });
             }
 
-            var currentUser = _mapper.Map<CurrentUserDto>(result.Value);
+            var currentUser = _mapper.Map<UserDto>(result.Value);
 
-            var roles = User.FindAll("role").Select(c => c.Value).ToList();
-            currentUser.Role = roles.Count > 0 ? string.Join(", ", roles) : string.Empty;
+            currentUser.Role = User.FindAll("role").Select(c => c.Value).ToList();
 
             return Ok(currentUser);
         }

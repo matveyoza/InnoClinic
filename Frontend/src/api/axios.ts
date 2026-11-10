@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AxiosError } from 'axios';
-import { useAuthStore } from '../store/useAuthStore';
-import { useUserStore } from '../store/useUserStore';
+import { useAuth } from '../store/useAuth';
+import { useUser } from '../store/useUser';
 
 export const userApi = axios.create({
     baseURL: '/api/users',
@@ -32,8 +32,8 @@ export const setupAxiosInterceptors = () => {
         const isLoginRequest = error.config?.url?.includes('/login');
 
         if (error.response?.status === 401 && !isLoginRequest) {
-            useAuthStore.getState().setIsAuthenticated(false);
-            useUserStore.getState().setUser(null);
+            useAuth.getState().setIsAuthenticated(false);
+            useUser.getState().setUser(null);
         }
         return Promise.reject(error);
     };

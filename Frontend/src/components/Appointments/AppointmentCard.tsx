@@ -11,7 +11,8 @@ import {
 import { AppointmentStatus } from "../../types/enums/appointmentStatus";
 import type { Appointment } from "../../types/appointment";
 import type { AppointmentDocument } from "../../types/appointmentDocument";
-import { useUserStore } from "../../store/useUserStore";
+import { useUser } from "../../store/useUser";
+import guestAvatar from "../../assets/hero.png";
 
 interface AppointmentCardProps {
     appointment: Appointment;
@@ -24,7 +25,7 @@ const STATUS_STYLES: Record<AppointmentStatus, string> = {
 };
 
 export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
-    const user = useUserStore((state) => state.user);
+    const user = useUser((state) => state.user);
     const [selectedDoc, setSelectedDoc] = useState<AppointmentDocument | null>(null);
 
     const isDoctor = user?.roles?.includes('Doctor') ?? false;
@@ -37,8 +38,9 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
         : appointment.doctorName;
 
     const avatarUrl = isDoctor 
-        ? null 
-        : appointment.doctorAvatarUrl;
+        ? appointment.patientAvatarUrl 
+        : appointment.doctorAvatarUrl
+        ?? guestAvatar;
 
     return (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

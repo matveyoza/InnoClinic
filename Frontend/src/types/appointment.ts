@@ -5,6 +5,7 @@ export interface Appointment {
     id: string;
     patientId: string;
     patientName: string;
+    patientAvatarUrl?: string | null;
     doctorId: string;
     doctorName: string;
     doctorSpecialty: string;

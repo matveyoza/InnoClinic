@@ -1,8 +1,8 @@
 import { Outlet, Navigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuth } from "../store/useAuth";
 import { useEffect } from "react";
 import { userApi } from "../api/axios";
-import { useUserStore } from "../store/useUserStore";
+import { useUser } from "../store/useUser";
 import type { UserRole } from "../types/user";
 
 interface ProtectedRouteProps {
@@ -10,13 +10,13 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-    const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-    const loading = useAuthStore(state => state.loading);
-    const setIsAuthenticated = useAuthStore(state => state.setIsAuthenticated);
-    const setLoading = useAuthStore(state => state.setLoading);
-    const setUser = useUserStore(state => state.setUser);
+    const isAuthenticated = useAuth(state => state.isAuthenticated);
+    const loading = useAuth(state => state.loading);
+    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);
+    const setLoading = useAuth(state => state.setLoading);
+    const setUser = useUser(state => state.setUser);
 
-    const user = useUserStore(state => state.user);
+    const user = useUser(state => state.user);
 
     useEffect(() => {
         if (isAuthenticated && user) {
@@ -54,7 +54,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (allowedRoles && !allowedRoles.includes(user.roles[0])) {
+    if (allowedRoles && !user.roles.some((role) => allowedRoles.includes(role))) {
         return <Navigate to="/main" replace />;
     }
 

@@ -12,9 +12,9 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
-    const displayRole = Array.isArray(user?.role) 
-        ? user.role.join(', ') 
-        : (user?.role ?? 'Guest');
+    const displayRole = Array.isArray(user?.roles) 
+        ? user.roles.join(', ') 
+        : (user?.roles ?? 'Guest');
 
     const handleOpenSettings = () => {
         setIsOpen(false);

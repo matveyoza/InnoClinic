@@ -7,6 +7,7 @@ namespace Service.Shared.DataTransferObjects
         public Guid Id { get; init; }
         public Guid PatientId { get; init; }
         public string PatientName { get; init; } = string.Empty;
+        public string? PatientAvatarUrl { get; set; }
         public Guid DoctorId { get; init; }
         public string DoctorName { get; init; } = string.Empty;
         public string DoctorSpecialty { get; init; } = string.Empty;

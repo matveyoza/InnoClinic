@@ -6,9 +6,9 @@ namespace AppointmentPresentation.Extensions
     {
         public static Guid GetUserId(this ClaimsPrincipal user)
         {
-            var idClaim = user.FindFirst("sub")?.Value ?? string.Empty;
+            var userId = user.FindFirst("sub")?.Value ?? string.Empty;
 
-            return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
+            return Guid.TryParse(userId, out var id) ? id : Guid.Empty;
         }
 
         public static string GetRole(this ClaimsPrincipal user)

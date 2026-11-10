@@ -1,53 +1,49 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useLoaderData, useRevalidator, useNavigation } from 'react-router-dom';
 import { appointmentApi } from '../../api/axios';
 import { AppointmentCard } from '../../components/Appointments/AppointmentCard';
 import { CreateAppointmentTab } from '../../components/Appointments/CreateAppointmentTab';
 import { Layout } from '../../components/Layout/Layout';
-import { useUserStore } from '../../store/useUserStore';
+import { useUser } from '../../store/useUser';
 import type { Appointment } from '../../types/appointment';
 import { AppointmentStatus } from '../../types/enums/appointmentStatus';
 
-export const MainPage = () => {
-  const user = useUserStore((state) => state.user);
-  const hasRole = useUserStore((state) => state.hasRole);
+export const mainPageLoader = async (): Promise<Appointment[]> => {
+  const response = await appointmentApi.get<Appointment[]>('');
+  return response.data;
+};
 
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+export const MainPage = () => {
+  const user = useUser((state) => state.user);
+  const hasRole = useUser((state) => state.hasRole);
+
+  const appointments = useLoaderData() as Appointment[];
+  const revalidator = useRevalidator();
+  const navigation = useNavigation();
+
   const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const isRevalidating = revalidator.state === 'loading' || navigation.state === 'loading';
 
   const isDoctor = hasRole('Doctor');
   const isAdmin = hasRole('Admin');
   const canCreate = hasRole(['Patient', 'Admin']);
 
-  const fetchAppointments = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await appointmentApi.get<Appointment[]>('');
-      setAppointments(response.data);
-    } catch {
-      setError('Failed to load appointments. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAppointments();
-  }, []);
-
   const handleSaveAppointment = async (newAppointment: Omit<Appointment, 'id'>) => {
+    setActionError(null);
     try {
       await appointmentApi.post('', newAppointment);
-      await fetchAppointments();
+      revalidator.revalidate();
     } catch {
-      setError('Failed to create appointment.');
+      setActionError('Failed to create appointment.');
     }
   };
 
   const upcomingCount = appointments.filter(
-    (app) => app.status === AppointmentStatus.Upcoming
+    (app) =>
+      app.status === AppointmentStatus.Upcoming ||
+      (app.status as unknown) === 0
   ).length;
 
   const pageTitle = isAdmin
@@ -96,14 +92,16 @@ export const MainPage = () => {
           </div>
         </div>
 
+        {actionError && (
+          <div className="mt-4 py-3 px-4 text-center text-red-600 bg-red-50 rounded-lg text-sm border border-red-200">
+            {actionError}
+          </div>
+        )}
+
         <div className="mt-6 space-y-4">
-          {loading ? (
+          {isRevalidating ? (
             <div className="py-12 text-center text-slate-400 font-medium animate-pulse">
-              Loading appointments...
-            </div>
-          ) : error ? (
-            <div className="py-6 text-center text-red-500 bg-red-50 rounded-lg text-sm border border-red-100">
-              {error}
+              Refreshing appointments...
             </div>
           ) : appointments.length > 0 ? (
             appointments.map((appointment) => (

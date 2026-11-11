@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AxiosError } from 'axios';
-import { useAuthStore } from '../store/useAuthStore';
-import { useUserStore } from '../store/useUserStore';
+import { useAuthStore } from '../store/useAuth';
+import { useUserStore } from '../store/useUser';
 
 export const userApi = axios.create({
     baseURL: '/api/users',
@@ -13,6 +13,14 @@ export const userApi = axios.create({
 
 export const authApi = axios.create({
     baseURL: '/api/auth',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+export const appointmentApi = axios.create({
+    baseURL: '/api/appointments',
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
@@ -32,9 +40,11 @@ export const setupAxiosInterceptors = () => {
 
     const authInterceptor = authApi.interceptors.response.use((res) => res, handleUnauthorized);
     const userInterceptor = userApi.interceptors.response.use((res) => res, handleUnauthorized);
-
+    const appointmentInterceptor = appointmentApi.interceptors.response.use((res) => res, handleUnauthorized);
+    
     return () => {
         authApi.interceptors.response.eject(authInterceptor);
         userApi.interceptors.response.eject(userInterceptor);
+        appointmentApi.interceptors.response.eject(appointmentInterceptor);
     };
 };

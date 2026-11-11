@@ -3,12 +3,17 @@ import { AppointmentStatus } from '../types/enums/appointmentStatus';
 
 export interface Appointment {
     id: string;
+    patientId: string;
+    patientName: string;
+    patientAvatarUrl?: string | null;
+    doctorId: string;
     doctorName: string;
     doctorSpecialty: string;
-    doctorAvatarUrl?: string;
+    doctorAvatarUrl?: string | null;
     date: string;
     time: string;
-    status: AppointmentStatus;
     room: number;
+    status: AppointmentStatus;
     documents?: AppointmentDocument[];
+    createdAtUtc?: string; 
 }

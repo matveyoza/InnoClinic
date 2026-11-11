@@ -11,6 +11,8 @@ import {
 import { AppointmentStatus } from "../../types/enums/appointmentStatus";
 import type { Appointment } from "../../types/appointment";
 import type { AppointmentDocument } from "../../types/appointmentDocument";
+import { useUserStore } from "../../store/useUser";
+import guestAvatar from "../../assets/hero.png";
 
 interface AppointmentCardProps {
     appointment: Appointment;
@@ -23,18 +25,31 @@ const STATUS_STYLES: Record<AppointmentStatus, string> = {
 };
 
 export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
+    const user = useUserStore((state) => state.user);
     const [selectedDoc, setSelectedDoc] = useState<AppointmentDocument | null>(null);
 
+    const isDoctor = user?.roles?.includes('Doctor') ?? false;
+    const isAdmin = user?.roles?.includes('Admin') ?? false;
+
     const StatusBadge = STATUS_STYLES[appointment.status] ?? 'bg-slate-50 text-slate-700 border-slate-200';
+
+    const displayName = isDoctor 
+        ? appointment.patientName 
+        : appointment.doctorName;
+
+    const avatarUrl = isDoctor 
+        ? appointment.patientAvatarUrl 
+        : appointment.doctorAvatarUrl
+        ?? guestAvatar;
 
     return (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-lg shrink-0 overflow-hidden">
-                    {appointment.doctorAvatarUrl ? (
+                    {avatarUrl ? (
                         <img
-                            src={appointment.doctorAvatarUrl}
-                            alt={appointment.doctorName}
+                            src={avatarUrl}
+                            alt={displayName}
                             className="w-12 h-12 rounded-full object-cover"
                         />
                     ) : (
@@ -42,8 +57,20 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
                     )}
                 </div>
                 <div>
-                    <h3 className="font-semibold text-slate-800 text-base">{appointment.doctorName}</h3>
-                    <p className="text-emerald-600 text-xs font-medium">{appointment.doctorSpecialty}</p>
+                    <h3 className="font-semibold text-slate-800 text-base">{displayName}</h3>
+                    
+                    {isDoctor && (
+                        <p className="text-emerald-600 text-xs font-medium">Patient</p>
+                    )}
+                    {!isDoctor && !isAdmin && appointment.doctorSpecialty && (
+                        <p className="text-emerald-600 text-xs font-medium">{appointment.doctorSpecialty}</p>
+                    )}
+                    {isAdmin && (
+                        <p className="text-slate-500 text-xs font-medium">
+                            Dr. {appointment.doctorName} • Patient: {appointment.patientName}
+                        </p>
+                    )}
+
                     <p className="text-slate-400 text-xs mt-1 flex items-center gap-1.5">
                         <FaMapMarkerAlt className="w-3 h-3 text-slate-400 shrink-0" />
                         <span>{"Room: " + appointment.room}</span>
@@ -77,11 +104,12 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
                 </span>
 
                 {appointment.documents && appointment.documents.length > 0 && (
-                    <div className="flex items-center gap-1.5 mt-1">
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                         <span className="text-xs text-slate-400 mr-1">Docs:</span>
                         {appointment.documents.map((doc) => (
                             <button
                                 key={doc.id}
+                                type="button"
                                 onClick={() => setSelectedDoc(doc)}
                                 className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
                             >
@@ -97,6 +125,7 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
                 <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative">
                         <button
+                            type="button"
                             onClick={() => setSelectedDoc(null)}
                             className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-lg transition-colors cursor-pointer"
                         >
@@ -115,7 +144,7 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
 
                         <div className="bg-slate-50 p-8 rounded-xl text-center text-slate-400 text-sm mb-6 border border-slate-200 flex flex-col items-center justify-center gap-2">
                             <FaFileAlt className="w-8 h-8 text-slate-300" />
-                            <span>Document preview for <strong className="text-slate-600">{selectedDoc.fileUrl}</strong></span>
+                            <span>Document preview for <strong className="text-slate-600">{selectedDoc.name}</strong></span>
                         </div>
 
                         <div className="flex justify-end gap-2">

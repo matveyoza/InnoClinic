@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Service.Shared.Constants
+﻿namespace Service.Shared.Constants
 {
     public static class AppRoles
     {

@@ -11,7 +11,7 @@ import {
 import { AppointmentStatus } from "../../types/enums/appointmentStatus";
 import type { Appointment } from "../../types/appointment";
 import type { AppointmentDocument } from "../../types/appointmentDocument";
-import { useUser } from "../../store/useUser";
+import { useUserStore } from "../../store/useUser";
 import guestAvatar from "../../assets/hero.png";
 
 interface AppointmentCardProps {
@@ -25,7 +25,7 @@ const STATUS_STYLES: Record<AppointmentStatus, string> = {
 };
 
 export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
-    const user = useUser((state) => state.user);
+    const user = useUserStore((state) => state.user);
     const [selectedDoc, setSelectedDoc] = useState<AppointmentDocument | null>(null);
 
     const isDoctor = user?.roles?.includes('Doctor') ?? false;

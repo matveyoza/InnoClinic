@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../store/useAuth";
-import { useUser } from "../../store/useUser";
+import { useAuthStore } from "../../store/useAuth";
+import { useUserStore } from "../../store/useUser";
 import axios from "axios";
 import type { User } from "../../types/user";
 import { authApi } from "../../api/axios";
@@ -27,10 +27,10 @@ type LoginInputs = z.infer<typeof loginSchema>;
 export const LogInPage = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
-    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);
-    const setUser = useUser(state => state.setUser);
+    const setIsAuthenticated = useAuthStore(state => state.setIsAuthenticated);
+    const setUser = useUserStore(state => state.setUser);
     const navigate = useNavigate();
-    const setLoading = useAuth(state => state.setLoading);
+    const setLoading = useAuthStore(state => state.setLoading);
 
     const {
         register,

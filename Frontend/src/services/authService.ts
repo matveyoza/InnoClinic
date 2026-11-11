@@ -1,10 +1,10 @@
 import { authApi } from '../api/axios';
-import { useAuth } from '../store/useAuth';
-import { useUser } from '../store/useUser';
+import { useAuthStore } from '../store/useAuth';
+import { useUserStore } from '../store/useUser';
 
 export const logout = async () => {
-    const setIsAuthenticated = useAuth.getState().setIsAuthenticated;
-    const setUser = useUser.getState().setUser;
+    const setIsAuthenticated = useAuthStore.getState().setIsAuthenticated;
+    const setUser = useUserStore.getState().setUser;
     try {
         await authApi.post('/auth/logout');
     } finally {

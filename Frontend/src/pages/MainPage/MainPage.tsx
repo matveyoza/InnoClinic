@@ -4,7 +4,7 @@ import { appointmentApi } from '../../api/axios';
 import { AppointmentCard } from '../../components/Appointments/AppointmentCard';
 import { CreateAppointmentTab } from '../../components/Appointments/CreateAppointmentTab';
 import { Layout } from '../../components/Layout/Layout';
-import { useUser } from '../../store/useUser';
+import { useUserStore } from '../../store/useUser';
 import type { Appointment } from '../../types/appointment';
 import { AppointmentStatus } from '../../types/enums/appointmentStatus';
 
@@ -14,8 +14,8 @@ export const mainPageLoader = async (): Promise<Appointment[]> => {
 };
 
 export const MainPage = () => {
-  const user = useUser((state) => state.user);
-  const hasRole = useUser((state) => state.hasRole);
+  const user = useUserStore((state) => state.user);
+  const hasRole = useUserStore((state) => state.hasRole);
 
   const appointments = useLoaderData() as Appointment[];
   const revalidator = useRevalidator();

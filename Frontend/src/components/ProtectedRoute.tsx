@@ -1,8 +1,8 @@
 import { Outlet, Navigate } from "react-router-dom";
-import { useAuth } from "../store/useAuth";
+import { useAuthStore } from "../store/useAuth";
 import { useEffect } from "react";
 import { userApi } from "../api/axios";
-import { useUser } from "../store/useUser";
+import { useUserStore } from "../store/useUser";
 import type { UserRole } from "../types/user";
 
 interface ProtectedRouteProps {
@@ -10,13 +10,13 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-    const isAuthenticated = useAuth(state => state.isAuthenticated);
-    const loading = useAuth(state => state.loading);
-    const setIsAuthenticated = useAuth(state => state.setIsAuthenticated);
-    const setLoading = useAuth(state => state.setLoading);
-    const setUser = useUser(state => state.setUser);
+    const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+    const loading = useAuthStore(state => state.loading);
+    const setIsAuthenticated = useAuthStore(state => state.setIsAuthenticated);
+    const setLoading = useAuthStore(state => state.setLoading);
+    const setUser = useUserStore(state => state.setUser);
 
-    const user = useUser(state => state.user);
+    const user = useUserStore(state => state.user);
 
     useEffect(() => {
         if (isAuthenticated && user) {

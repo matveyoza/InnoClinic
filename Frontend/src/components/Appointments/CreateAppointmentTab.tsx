@@ -5,7 +5,7 @@ import { z } from "zod";
 import { MdClose, MdAttachFile, MdDeleteOutline, MdDescription } from "react-icons/md";
 import { AppointmentStatus } from "../../types/enums/appointmentStatus";
 import type { Appointment } from "../../types/appointment";
-import { useUser } from "../../store/useUser";
+import { useUserStore } from "../../store/useUser";
 
 const appointmentDocumentSchema = z.object({
   id: z.string(),
@@ -39,7 +39,7 @@ interface CreateAppointmentTabProps {
 }
 
 export const CreateAppointmentTab = ({ isOpen, onClose, onSave }: CreateAppointmentTabProps) => {
-  const user = useUser((state) => state.user);
+  const user = useUserStore((state) => state.user);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {

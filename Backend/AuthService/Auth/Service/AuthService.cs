@@ -85,7 +85,6 @@ public class AuthService : IAuthService
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id),
             new(ClaimTypes.Name, user.UserName ?? user.Email ?? string.Empty),
             new(ClaimTypes.Email, user.Email ?? string.Empty),
             new("sub", user.Id)

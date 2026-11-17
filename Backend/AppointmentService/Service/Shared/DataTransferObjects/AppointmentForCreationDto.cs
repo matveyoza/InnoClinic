@@ -4,6 +4,7 @@
     {
         public Guid PatientId { get; set; }
         public string PatientName { get; set; } = string.Empty;
+        public string? PatientAvatarUrl { get; set; }
         public Guid DoctorId { get; init; }
         public string DoctorName { get; init; } = string.Empty;
         public string DoctorSpecialty { get; init; } = string.Empty;

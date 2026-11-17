@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../store/useAuthStore";
-import { useUserStore } from "../../store/useUserStore";
+import { useAuthStore } from "../../store/useAuth";
+import { useUserStore } from "../../store/useUser";
 import axios from "axios";
 import type { User } from "../../types/user";
 import { authApi } from "../../api/axios";

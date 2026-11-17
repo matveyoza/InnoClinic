@@ -1,6 +1,6 @@
 import { authApi } from '../api/axios';
-import { useAuthStore } from '../store/useAuthStore';
-import { useUserStore } from '../store/useUserStore';
+import { useAuthStore } from '../store/useAuth';
+import { useUserStore } from '../store/useUser';
 
 export const logout = async () => {
     const setIsAuthenticated = useAuthStore.getState().setIsAuthenticated;

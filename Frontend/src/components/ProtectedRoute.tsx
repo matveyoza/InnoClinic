@@ -1,8 +1,8 @@
 import { Outlet, Navigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/useAuth";
 import { useEffect } from "react";
 import { userApi } from "../api/axios";
-import { useUserStore } from "../store/useUserStore";
+import { useUserStore } from "../store/useUser";
 import type { UserRole } from "../types/user";
 
 interface ProtectedRouteProps {
@@ -54,7 +54,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (allowedRoles && !allowedRoles.includes(user.role)) {
+    if (allowedRoles && !user.roles.some((role) => allowedRoles.includes(role))) {
         return <Navigate to="/main" replace />;
     }
 

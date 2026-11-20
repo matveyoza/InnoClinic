@@ -10,5 +10,7 @@ namespace Service.Shared
         public string? LastName { get; init; }
         public string? UserName { get; init; }
         public string Role { get; init; } = AppRoles.Patient;
+        public string? Specialty { get; init; }
+        public int? RoomNumber { get; init; }
     }
 }

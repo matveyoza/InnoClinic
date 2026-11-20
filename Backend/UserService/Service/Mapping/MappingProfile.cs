@@ -9,7 +9,11 @@ namespace Service.Mapping
         public MappingProfile()
         {
             CreateMap<UserProfileDto, User>();
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.Specialty, opt =>
+                    opt.MapFrom(src => src.DoctorProfile.Specialty))
+                .ForMember(dest => dest.RoomNumber, opt =>
+                    opt.MapFrom(src => src.DoctorProfile.RoomNumber));
         }
     }
 }

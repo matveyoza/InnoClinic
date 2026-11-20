@@ -8,5 +8,7 @@
         public string UserName { get; init; } = string.Empty;
         public string Email { get; init; } = string.Empty;
         public string[] Role { get; set; } = Array.Empty<string>();
+        public string? Specialty { get; init; }
+        public int? RoomNumber { get; init; }
     }
 }

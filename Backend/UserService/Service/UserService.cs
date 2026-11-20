@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Service.Contracts;
+using Service.Shared.Constants;
 using Service.Shared.DataTransferObjects;
 
 namespace Service
@@ -47,9 +48,31 @@ namespace Service
             return userDto;
         }
 
+        public async Task<IEnumerable<UserDto>> GetDoctorsAsync(CancellationToken cancellationToken)
+        {
+            var doctorsInRole = await _userManager.GetUsersInRoleAsync(AppRoles.Doctor);
+            var doctorIds = doctorsInRole.Select(d => d.Id).ToList();
+
+            var doctorsWithProfiles = await _userManager.Users
+                .Include(u => u.DoctorProfile)
+                .Where(u => doctorIds.Contains(u.Id))
+                .ToListAsync(cancellationToken);
+
+            return _mapper.Map<IEnumerable<UserDto>>(doctorsWithProfiles);
+        }
+
         public async Task<bool> CreateUserProfileAsync(UserProfileDto profileDto)
         {
             var user = _mapper.Map<User>(profileDto);
+
+            if (!string.IsNullOrWhiteSpace(profileDto.Specialty))
+            {
+                user.DoctorProfile = new DoctorProfile
+                {
+                    Specialty = profileDto.Specialty,
+                    RoomNumber = profileDto.RoomNumber ?? 0
+                };
+            }
 
             var result = await _userManager.CreateAsync(user);
 
@@ -58,6 +81,15 @@ namespace Service
                 var errors = string.Join(", ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
                 _logger.LogError("Failed profile creation for ID {UserId}. Errors: {Errors}", user.Id, errors);
                 return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(profileDto.Role))
+            {
+                var roleResult = await _userManager.AddToRoleAsync(user, profileDto.Role);
+                if (!roleResult.Succeeded)
+                {
+                    _logger.LogWarning("Profile created, but failed to add role {Role} in UserService.", profileDto.Role);
+                }
             }
 
             return true;

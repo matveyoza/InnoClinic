@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace AppointmentPresentation.Extensions
+namespace Appointments.Presentation.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
@@ -15,6 +15,7 @@ namespace AppointmentPresentation.Extensions
         {
             return user.FindFirst("role")?.Value ?? string.Empty;
         }
+
         public static string GetUserName(this ClaimsPrincipal user)
         {
             return user.FindFirstValue(ClaimTypes.Name)

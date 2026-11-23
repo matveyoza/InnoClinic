@@ -1,6 +1,7 @@
 <Solution>
-  <Project Path="AppointmentService/AppointmentPresentation.csproj" />
-  <Project Path="Entities/Entities.csproj" />
-  <Project Path="Repository/Repository.csproj" />
-  <Project Path="Service/Service.csproj" />
+  <Project Path="../InnoClinic.Shared/InnoClinic.Shared.csproj" Id="efd57427-bc36-4ae3-be17-ed9641c80267" />
+  <Project Path="AppointmentService/Appointments.Presentation.csproj" />
+  <Project Path="Entities/Appointments.Entities.csproj" />
+  <Project Path="Repository/Appointments.Repository.csproj" />
+  <Project Path="Service/Appointments.Service.csproj" />
 </Solution>

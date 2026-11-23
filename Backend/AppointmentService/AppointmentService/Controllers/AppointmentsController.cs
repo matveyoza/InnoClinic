@@ -1,11 +1,11 @@
-﻿using AppointmentPresentation.Extensions;
+﻿using Appointments.Presentation.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Service.Contracts;
-using Service.Shared.Constants;
-using Service.Shared.DataTransferObjects;
+using Appointments.Service.Contracts;
+using Appointments.Service.Shared.DataTransferObjects;
+using InnoClinic.Shared.Constants;
 
-namespace AppointmentPresentation.Controllers;
+namespace Appointments.Presentation.Controllers;
 
 [ApiController]
 [Route("api/appointments")]
@@ -32,7 +32,7 @@ public class AppointmentsController : ControllerBase
     [Authorize(Roles = $"{AppRoles.Patient},{AppRoles.Admin}")]
     public async Task<IActionResult> CreateAppointment([FromBody] AppointmentForCreationDto request, CancellationToken cancellationToken)
     {
-        var created = await _appointmentService.CreateAppointmentAsync(User.GetUserId(), User.GetRole(), User.GetUserName(), request, cancellationToken);
+        await _appointmentService.CreateAppointmentAsync(User.GetUserId(), User.GetRole(), User.GetUserName(), request, cancellationToken);
 
         return Created();
     }

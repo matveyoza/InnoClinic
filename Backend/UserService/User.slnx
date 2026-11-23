@@ -1,6 +1,7 @@
 <Solution>
-  <Project Path="UsersPresentation/UsersPresentation.csproj" />
-  <Project Path="Entities/Entities.csproj" />
-  <Project Path="Repository/Repository.csproj" />
-  <Project Path="Service/Service.csproj" />
+  <Project Path="../InnoClinic.Shared/InnoClinic.Shared.csproj" />
+  <Project Path="Entities/Users.Entities.csproj" />
+  <Project Path="Repository/Users.Repository.csproj" />
+  <Project Path="Service/Users.Service.csproj" />
+  <Project Path="UsersPresentation/Users.Presentation.csproj" />
 </Solution>

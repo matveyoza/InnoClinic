@@ -1,9 +1,9 @@
-﻿using Entities.Models;
+﻿using Auth.Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repository
+namespace Auth.Repository
 {
     public class AuthDbContext : IdentityDbContext<User>
     {

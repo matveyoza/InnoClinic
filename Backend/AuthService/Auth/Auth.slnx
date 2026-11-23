@@ -1,6 +1,7 @@
 <Solution>
-  <Project Path="Auth/AuthPresentation.csproj" />
-  <Project Path="Entities/Entities.csproj" />
-  <Project Path="Repository/Repository.csproj" />
-  <Project Path="Service/Service.csproj" />
+  <Project Path="../../InnoClinic.Shared/InnoClinic.Shared.csproj" />
+  <Project Path="Auth/Auth.Presentation.csproj" />
+  <Project Path="Entities/Auth.Entities.csproj" />
+  <Project Path="Repository/Auth.Repository.csproj" />
+  <Project Path="Service/Auth.Service.csproj" />
 </Solution>

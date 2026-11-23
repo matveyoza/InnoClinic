@@ -1,6 +1,6 @@
-﻿using Service.Shared.DataTransferObjects;
+﻿using Appointments.Service.Shared.DataTransferObjects;
 
-namespace Service.Contracts
+namespace Appointments.Service.Contracts
 {
     public interface IAppointmentService
     {

@@ -1,8 +1,8 @@
-using Backend.Extensions;
 using DotNetEnv;
-using Service;
-using Service.Constants;
-using Service.Contracts;
+using Users.Service;
+using Users.Service.Constants;
+using Users.Service.Contracts;
+using Users.Presentation.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +22,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.AddMaps(typeof(Service.Mapping.MappingProfile).Assembly);
+    cfg.AddMaps(typeof(Users.Service.Mapping.MappingProfile).Assembly);
 });
 
 var app = builder.Build();

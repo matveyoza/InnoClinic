@@ -1,7 +1,7 @@
-﻿using Service.Shared.DataTransferObjects;
-using FluentValidation;
+﻿using FluentValidation;
+using Users.Service.Shared.DataTransferObjects;
 
-namespace Service.Validators
+namespace Users.Service.Validators
 {
     public class UserProfileDtoValidator : AbstractValidator<UserProfileDto>
     {

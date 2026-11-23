@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using Entities.Contracts;
-using Entities.Models;
-using Service.Contracts;
-using Service.Shared.Constants;
-using Service.Shared.DataTransferObjects;
+﻿using Appointments.Service.Contracts;
+using InnoClinic.Shared.Constants;
+using Appointments.Service.Shared.DataTransferObjects;
+using AutoMapper;
+using Appointments.Entities.Contracts;
+using Appointments.Entities.Models;
 
-namespace Service;
+namespace Appointments.Service;
 
 public class AppointmentService : IAppointmentService
 {

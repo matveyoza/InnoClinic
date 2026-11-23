@@ -1,4 +1,4 @@
-﻿namespace Entities.Shared
+﻿namespace Users.Entities.Shared
 {
     public class Result<T>
     {

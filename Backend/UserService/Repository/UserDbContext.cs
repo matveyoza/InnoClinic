@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Entities.Models;
+using Users.Entities.Models;
 
-namespace Repository
+namespace Users.Repository
 {
     public class UserDbContext : IdentityDbContext<User>
     {

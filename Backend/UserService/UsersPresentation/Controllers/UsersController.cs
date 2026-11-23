@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Service.Contracts;
-using Service.Shared.Constants;
-using Service.Shared.DataTransferObjects;
-using System.Security.Claims;
+using Users.Service.Contracts;
+using Users.Service.Shared.DataTransferObjects;
+using InnoClinic.Shared.Constants;
 
-namespace UsersPresentation.Controllers
+namespace Users.Presentation.Controllers
 {
     [Route("api/users")]
     [ApiController]

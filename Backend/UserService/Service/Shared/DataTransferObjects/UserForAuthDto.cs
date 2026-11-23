@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Shared.DataTransferObjects
+namespace Users.Service.Shared.DataTransferObjects
 {
     public record UserForAuthDto
     {

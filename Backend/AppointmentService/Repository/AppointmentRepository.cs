@@ -1,9 +1,9 @@
-﻿using Entities.Contracts;
-using Entities.Models;
+﻿using Appointments.Entities.Contracts;
+using Appointments.Entities.Models;
 using Microsoft.EntityFrameworkCore;
-using Service.Shared.Constants;
+using InnoClinic.Shared.Constants;
 
-namespace Repository
+namespace Appointments.Repository
 {
     public class AppointmentRepository : IAppointmentRepository
     {
@@ -34,7 +34,7 @@ namespace Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<Appointment?> GetAppointmentByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return await _context.Appointments
                 .Include(a => a.Documents)

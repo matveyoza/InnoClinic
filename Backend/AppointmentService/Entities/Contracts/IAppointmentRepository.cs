@@ -1,12 +1,12 @@
-﻿using Entities.Models;
+﻿using Appointments.Entities.Models;
 
-namespace Entities.Contracts
+namespace Appointments.Entities.Contracts
 {
     public interface IAppointmentRepository
     {
         Task<IEnumerable<Appointment>> GetAppointmentsByRoleAsync(Guid userId, string role, CancellationToken cancellationToken);
 
-        Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<Appointment?> GetAppointmentByIdAsync(Guid id, CancellationToken cancellationToken);
 
         Task CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken);
 

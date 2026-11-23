@@ -1,7 +1,7 @@
-﻿using Service.Shared.DataTransferObjects;
-using FluentValidation;
+﻿using FluentValidation;
+using Appointments.Service.Shared.DataTransferObjects;
 
-namespace Service.Validators
+namespace Appointments.Service.Validators
 {
     public class AppointmentForCreationDtoValidator : AbstractValidator<AppointmentForCreationDto>
     {

@@ -1,8 +1,8 @@
-﻿using Entities.Models;
-using Service.Shared;
-using AutoMapper;
+﻿using AutoMapper;
+using Auth.Service.Shared;
+using Auth.Entities.Models;
 
-namespace Service.Mapping
+namespace Auth.Service.Mapping
 {
     public class MappingProfile : Profile
     {

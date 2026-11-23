@@ -1,4 +1,4 @@
-﻿namespace Service.Shared
+﻿namespace Auth.Service.Shared
 {
     public sealed record UserProfileCreationDto
     {

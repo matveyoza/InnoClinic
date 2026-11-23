@@ -1,8 +1,8 @@
-﻿using Service.Shared.DataTransferObjects;
-using AutoMapper;
-using Entities.Models;
+﻿using AutoMapper;
+using Appointments.Entities.Models;
+using Appointments.Service.Shared.DataTransferObjects;
 
-namespace Service.Mapping;
+namespace Appointments.Service.Mapping;
 
 public class MappingProfile : Profile
 {

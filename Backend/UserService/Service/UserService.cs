@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using Entities.Models;
-using Entities.Shared;
+using Users.Entities.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Service.Contracts;
-using Service.Shared.DataTransferObjects;
+using Users.Entities.Models;
+using Users.Service.Contracts;
+using Users.Service.Shared.DataTransferObjects;
 
-namespace Service
+namespace Users.Service
 {
     public class UserService : IUserService
     {

@@ -1,4 +1,4 @@
-﻿namespace Entities.Models
+﻿namespace Appointments.Entities.Models
 {
     public sealed class Appointment
     {

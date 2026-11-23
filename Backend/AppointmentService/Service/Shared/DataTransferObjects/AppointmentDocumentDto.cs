@@ -1,4 +1,4 @@
-﻿namespace Service.Shared.DataTransferObjects
+﻿namespace Appointments.Service.Shared.DataTransferObjects
 {
     public record AppointmentDocumentDto
     {

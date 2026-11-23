@@ -1,7 +1,7 @@
-﻿using Entities.Shared;
-using Service.Shared.DataTransferObjects;
+﻿using Users.Entities.Shared;
+using Users.Service.Shared.DataTransferObjects;
 
-namespace Service.Contracts
+namespace Users.Service.Contracts
 {
     public interface IUserService
     {

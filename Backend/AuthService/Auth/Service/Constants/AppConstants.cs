@@ -1,4 +1,4 @@
-﻿namespace Service.Constants
+﻿namespace Auth.Service.Constants
 {
     public static class AppConstants
     {

@@ -1,6 +1,6 @@
-﻿using Service.Constants;
+﻿using InnoClinic.Shared.Constants;
 
-namespace Service.Shared
+namespace Auth.Service.Shared
 {
     public sealed record UserForRegistrationDto
     {

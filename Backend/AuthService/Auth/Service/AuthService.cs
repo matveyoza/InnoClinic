@@ -1,18 +1,18 @@
-﻿using AutoMapper;
-using Entities.Models;
+﻿using Auth.Entities.Models;
+using Auth.Service.Constants;
+using Auth.Service.Contracts;
+using Auth.Service.Shared;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Service.Constants;
-using Service.Contracts;
-using Service.Shared;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
-namespace Service;
+namespace Auth.Service;
 
 public class AuthService : IAuthService
 {

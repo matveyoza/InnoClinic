@@ -1,6 +1,6 @@
-﻿using Entities.Models;
+﻿using Appointments.Entities.Models;
 
-namespace Service.Shared.DataTransferObjects
+namespace Appointments.Service.Shared.DataTransferObjects
 {
     public record AppointmentDto
     {

@@ -1,7 +1,7 @@
-﻿using FluentValidation;
-using Service.Shared;
+﻿using Auth.Service.Shared;
+using FluentValidation;
 
-namespace Service.Validators
+namespace Auth.Service.Validators
 {
     public sealed class UserForAuthenticationDtoValidator : AbstractValidator<UserForAuthenticationDto>
     {

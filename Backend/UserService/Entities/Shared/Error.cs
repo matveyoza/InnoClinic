@@ -1,4 +1,4 @@
-﻿namespace Entities.Shared
+﻿namespace Users.Entities.Shared
 {
     public record Error(string Code, string Message)
     {

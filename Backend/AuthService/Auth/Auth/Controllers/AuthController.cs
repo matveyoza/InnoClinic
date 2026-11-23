@@ -1,11 +1,12 @@
-﻿using Entities.Models;
+﻿using Auth.Entities.Models;
+using Auth.Service.Contracts;
+using Auth.Service.Shared;
+using InnoClinic.Shared.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Service.Contracts;
-using Service.Shared;
 
-namespace Auth.Controllers;
+namespace Auth.Presentation.Controllers;
 
 [ApiController]
 [Route("api/auth")]
@@ -56,7 +57,7 @@ public class AuthController : ControllerBase
         });
 
         var roles = await _userManager.GetRolesAsync(user);
-        var primaryRole = roles.FirstOrDefault() ?? "Patient";
+        var primaryRole = roles.FirstOrDefault() ?? AppRoles.Patient;
 
         return Ok(new
         {

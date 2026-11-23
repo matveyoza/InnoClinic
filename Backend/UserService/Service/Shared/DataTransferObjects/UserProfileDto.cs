@@ -1,6 +1,4 @@
-﻿
-
-namespace Service.Shared.DataTransferObjects
+﻿namespace Users.Service.Shared.DataTransferObjects
 {
     public record UserProfileDto
     {

@@ -1,7 +1,7 @@
-﻿using Entities.Models;
+﻿using Appointments.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repository
+namespace Appointments.Repository
 {
     public class AppointmentDbContext : DbContext
     {

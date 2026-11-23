@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Entities.Models;
-using Service.Shared.DataTransferObjects;
+using Users.Entities.Models;
+using Users.Service.Shared.DataTransferObjects;
 
-namespace Service.Mapping
+namespace Users.Service.Mapping
 {
     public class MappingProfile : Profile
     {

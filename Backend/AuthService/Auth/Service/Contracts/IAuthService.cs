@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Service.Shared;
-using Entities.Models;
+using Auth.Service.Shared;
+using Auth.Entities.Models;
 
-namespace Service.Contracts
+namespace Auth.Service.Contracts
 {
     public interface IAuthService
     {

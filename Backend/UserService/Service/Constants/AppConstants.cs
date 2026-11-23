@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Service.Constants
+namespace Users.Service.Constants
 {
     public static class AppConstants
     {

@@ -1,11 +1,12 @@
-using AuthPresentation.Extensions;
+using Auth.Presentation.Controllers;
+using Auth.Presentation.Extensions;
+using Auth.Service;
+using Auth.Service.Constants;
+using Auth.Service.Contracts;
+using Auth.Service.Mapping;
 using DotNetEnv;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Service;
-using Service.Constants;
-using Service.Contracts;
-using Service.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,7 @@ builder.Services.AddHttpClient("UserService", client =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers()
-    .AddApplicationPart(typeof(Auth.Controllers.AuthController).Assembly);
+    .AddApplicationPart(typeof(AuthController).Assembly);
 
 builder.Services.AddFluentValidationAutoValidation();
 

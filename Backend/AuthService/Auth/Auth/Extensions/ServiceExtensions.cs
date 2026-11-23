@@ -1,15 +1,15 @@
-﻿using Entities.Models;
+﻿using Auth.Entities.Models;
+using Auth.Repository;
+using Auth.Service.Constants;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Repository;
-using Service.Constants;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace AuthPresentation.Extensions
+namespace Auth.Presentation.Extensions
 {
     public static class ServiceExtensions
     {

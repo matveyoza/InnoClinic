@@ -1,15 +1,14 @@
-﻿using Entities.Contracts;
+﻿using Appointments.Repository;
+using Appointments.Entities.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Repository;
-using Service;
-using Service.Contracts;
+using Appointments.Service;
+using Appointments.Service.Contracts;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
-namespace AppointmentPresentation.Extensions
+namespace Appointments.Presentation.Extensions
 {
     public static class ServiceExtensions
     {

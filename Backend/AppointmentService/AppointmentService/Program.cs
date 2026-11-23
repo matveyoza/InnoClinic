@@ -1,9 +1,9 @@
-using AppointmentPresentation.Extensions;
 using DotNetEnv;
-using Service.Mapping;
-using Service.Validators;
+using Appointments.Service.Mapping;
+using Appointments.Service.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Appointments.Presentation.Extensions;
 
 Env.Load();
 

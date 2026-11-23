@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Repository;
+using Repository.Persistence;
 using Service.Constants;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

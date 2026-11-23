@@ -8,6 +8,6 @@
         public User User { get; set; } = null!;
 
         public string Specialty { get; set; } = string.Empty;
-        public int RoomNumber { get; set; }
+        public int? RoomNumber { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Service.Constants;
 
-namespace Service.Shared
+namespace Service.Shared.DataTransferObjects
 {
     public sealed record UserForRegistrationDto
     {

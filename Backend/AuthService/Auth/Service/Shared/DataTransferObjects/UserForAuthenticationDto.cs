@@ -1,4 +1,4 @@
-﻿namespace Service.Shared
+﻿namespace Service.Shared.DataTransferObjects
 {
     public sealed record UserForAuthenticationDto
     {

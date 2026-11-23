@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Service.Constants;
 using Service.Contracts;
-using Service.Shared;
+using Service.Shared.DataTransferObjects;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
-using Service.Shared;
+using Service.Shared.DataTransferObjects;
 
 namespace Auth.Controllers;
 

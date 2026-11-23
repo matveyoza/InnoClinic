@@ -70,7 +70,7 @@ namespace Service
                 user.DoctorProfile = new DoctorProfile
                 {
                     Specialty = profileDto.Specialty,
-                    RoomNumber = profileDto.RoomNumber ?? 0
+                    RoomNumber = profileDto.RoomNumber ?? null
                 };
             }
 

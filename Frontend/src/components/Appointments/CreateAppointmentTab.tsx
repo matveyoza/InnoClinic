@@ -14,17 +14,8 @@ import { AppointmentStatus } from "../../types/enums/appointmentStatus";
 import type { Appointment } from "../../types/appointment";
 import { useUserStore } from "../../store/useUser";
 import { userApi } from "../../api/axios";
-
-interface BackendDoctorDto {
-  id: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  userName?: string | null;
-  email?: string;
-  specialty: string;
-  roomNumber: number;
-  avatarUrl?: string | null;
-}
+import type { DoctorDto } from "../../dto/DoctorDto";
+import toast from "react-hot-toast";
 
 const appointmentDocumentSchema = z.object({
   id: z.string(),
@@ -34,7 +25,7 @@ const appointmentDocumentSchema = z.object({
 });
 
 const createAppointmentSchema = z.object({
-  doctorId: z.string().min(1, "Please select a doctor"),
+  doctorId: z.string().uuid("Must be a valid UUID").min(1, "Please select a doctor"),
   doctorName: z.string().min(1, "Doctor is required"),
   doctorSpecialty: z.string().min(1, "Specialty is required"),
   doctorAvatarUrl: z.string().url("Must be a valid URL").or(z.literal("")).optional(),
@@ -66,7 +57,7 @@ export const CreateAppointmentTab = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const [doctors, setDoctors] = useState<BackendDoctorDto[]>([]);
+  const [doctors, setDoctors] = useState<DoctorDto[]>([]);
   const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -103,10 +94,12 @@ export const CreateAppointmentTab = ({
     const fetchDoctors = async () => {
       setIsLoadingDoctors(true);
       try {
-        const response = await userApi.get<BackendDoctorDto[]>("/doctors");
+        const response = await userApi.get<DoctorDto[]>("/doctors");
         setDoctors(response.data);
+        toast.success("Doctors loaded successfully");
       } catch (error) {
         console.error("Failed to fetch doctors:", error);
+        toast.error("Failed to load doctors. Please check your connection.");
       } finally {
         setIsLoadingDoctors(false);
       }
@@ -127,19 +120,19 @@ export const CreateAppointmentTab = ({
 
   if (!isOpen) return null;
 
-  const formatDoctorName = (doc: BackendDoctorDto) => {
+  const formatDoctorName = (doc: DoctorDto) => {
     const fullName = [doc.firstName, doc.lastName].filter(Boolean).join(" ").trim();
     if (fullName) return `Dr. ${fullName}`;
     return doc.userName || doc.email || "";
   };
 
-  const handleSelectDoctor = (doc: BackendDoctorDto) => {
+  const handleSelectDoctor = (doc: DoctorDto) => {
     const formattedName = formatDoctorName(doc);
 
     setValue("doctorId", doc.id, { shouldValidate: true });
     setValue("doctorName", formattedName, { shouldValidate: true });
     setValue("doctorSpecialty", doc.specialty ?? "", { shouldValidate: true });
-    setValue("room", doc.roomNumber ?? 0, { shouldValidate: true });
+    setValue("room", doc.roomNumber ?? null, { shouldValidate: true });
     setValue("doctorAvatarUrl", doc.avatarUrl || "", { shouldValidate: true });
 
     setIsDropdownOpen(false);

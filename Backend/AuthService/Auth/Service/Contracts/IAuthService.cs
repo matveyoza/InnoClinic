@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Service.Shared;
 using Entities.Models;
+using Service.Shared.DataTransferObjects;
 
 namespace Service.Contracts
 {

@@ -1,30 +1,13 @@
 ﻿using Entities.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repository
+namespace Repository.Extensions
 {
-    public class UserDbContext : IdentityDbContext<User>
+    public static class ModelBuilderExtensions
     {
-        public UserDbContext(DbContextOptions<UserDbContext> options) : base(options)
+        public static void SeedRoles(this ModelBuilder modelBuilder)
         {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<User>(b =>
-            {
-                b.Ignore(u => u.PasswordHash);
-                b.Ignore(u => u.SecurityStamp);
-                b.Ignore(u => u.TwoFactorEnabled);
-                b.Ignore(u => u.LockoutEnd);
-                b.Ignore(u => u.LockoutEnabled);
-                b.Ignore(u => u.AccessFailedCount);
-            });
-
             modelBuilder.Entity<IdentityRole>().HasData(
                 new IdentityRole
                 {
@@ -48,7 +31,10 @@ namespace Repository
                     ConcurrencyStamp = "d4d4bfcb-eaa1-49f7-92cc-e27a9be9fb7e"
                 }
             );
+        }
 
+        public static void ConfigureDoctorProfile(this ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<User>()
                 .HasOne(u => u.DoctorProfile)
                 .WithOne(d => d.User)

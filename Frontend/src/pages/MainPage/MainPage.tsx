@@ -3,7 +3,7 @@ import { useLoaderData, useRevalidator, useNavigation } from 'react-router-dom';
 import { appointmentApi } from '../../api/axios';
 import { AppointmentCard } from '../../components/Appointments/AppointmentCard';
 import { CreateAppointmentTab } from '../../components/Appointments/CreateAppointmentTab';
-import { Layout } from '../../components/Layout/Layout';
+import { Layout } from '../../Layouts/Layout';
 import { useUserStore } from '../../store/useUser';
 import type { Appointment } from '../../types/appointment';
 import { AppointmentStatus } from '../../types/enums/appointmentStatus';

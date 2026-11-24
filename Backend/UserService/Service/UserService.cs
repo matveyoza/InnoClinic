@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using Entities.Models;
-using Entities.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Service.Contracts;
-using Service.Shared.Constants;
 using Service.Shared.DataTransferObjects;
+using Entities.Contracts;
 
 namespace Service
 {
@@ -17,12 +16,14 @@ namespace Service
         private readonly IMapper _mapper;
 
         private readonly ILogger<UserService> _logger;
+        private readonly IUserRepository _repository;
 
-        public UserService(UserManager<User> userManager, IMapper mapper, ILogger<UserService> logger)
+        public UserService(UserManager<User> userManager, IMapper mapper, ILogger<UserService> logger, IUserRepository repository)
         {
             _userManager = userManager;
             _mapper = mapper;
             _logger = logger;
+            _repository = repository;
         }
 
         public async Task<IEnumerable<UserDto>> GetUsersAsync(CancellationToken cancellationToken)
@@ -50,15 +51,9 @@ namespace Service
 
         public async Task<IEnumerable<UserDto>> GetDoctorsAsync(CancellationToken cancellationToken)
         {
-            var doctorsInRole = await _userManager.GetUsersInRoleAsync(AppRoles.Doctor);
-            var doctorIds = doctorsInRole.Select(d => d.Id).ToList();
+            var doctors = await _repository.GetDoctorsAsync(cancellationToken);
 
-            var doctorsWithProfiles = await _userManager.Users
-                .Include(u => u.DoctorProfile)
-                .Where(u => doctorIds.Contains(u.Id))
-                .ToListAsync(cancellationToken);
-
-            return _mapper.Map<IEnumerable<UserDto>>(doctorsWithProfiles);
+            return _mapper.Map<IEnumerable<UserDto>>(doctors);
         }
 
         public async Task<bool> CreateUserProfileAsync(UserProfileDto profileDto)

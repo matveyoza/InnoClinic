@@ -2,10 +2,23 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Extensions
+namespace Repository.Persistence.Extensions
 {
     public static class ModelBuilderExtensions
     {
+        public static void ConfigureUser(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>(b =>
+            {
+                b.Ignore(u => u.PasswordHash);
+                b.Ignore(u => u.SecurityStamp);
+                b.Ignore(u => u.TwoFactorEnabled);
+                b.Ignore(u => u.LockoutEnd);
+                b.Ignore(u => u.LockoutEnabled);
+                b.Ignore(u => u.AccessFailedCount);
+            });
+        }
+
         public static void SeedRoles(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<IdentityRole>().HasData(

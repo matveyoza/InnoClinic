@@ -4,7 +4,7 @@ import { MainPage, mainPageLoader } from "./pages/MainPage/MainPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { GlobalError } from "./components/GlobalError";
 import { SignUpPage } from "./pages/SignUpPage/SignUpPage";
-import { RootLayout } from "./components/Layout/RootLayout";
+import { RootLayout } from "./Layouts/RootLayout";
 
 const router = createBrowserRouter([
     {

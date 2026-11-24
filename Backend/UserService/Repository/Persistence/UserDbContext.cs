@@ -1,8 +1,7 @@
 ﻿using Entities.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Repository.Extensions;
+using Repository.Persistence.Extensions;
 
 namespace Repository.Persistence
 {
@@ -16,16 +15,7 @@ namespace Repository.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User>(b =>
-            {
-                b.Ignore(u => u.PasswordHash);
-                b.Ignore(u => u.SecurityStamp);
-                b.Ignore(u => u.TwoFactorEnabled);
-                b.Ignore(u => u.LockoutEnd);
-                b.Ignore(u => u.LockoutEnabled);
-                b.Ignore(u => u.AccessFailedCount);
-            });
-
+            modelBuilder.ConfigureUser();
             modelBuilder.SeedRoles();
             modelBuilder.ConfigureDoctorProfile();
         }

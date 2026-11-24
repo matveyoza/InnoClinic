@@ -31,7 +31,7 @@ const createAppointmentSchema = z.object({
   doctorAvatarUrl: z.string().url("Must be a valid URL").or(z.literal("")).optional(),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
-  room: z.number().min(1, "Room number must be greater than 0"),
+  room: z.number().min(1, "Room number must be greater than 0").nullable(),
   status: z.enum([
     AppointmentStatus.Upcoming,
     AppointmentStatus.Completed,
@@ -45,7 +45,7 @@ type CreateAppointmentInputs = z.infer<typeof createAppointmentSchema>;
 interface CreateAppointmentTabProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (appointment: Omit<Appointment, "id">) => void;
+  onSave: (appointment: Omit<Appointment, "id">) => Promise<void>;
 }
 
 export const CreateAppointmentTab = ({
@@ -67,7 +67,7 @@ export const CreateAppointmentTab = ({
     reset,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<CreateAppointmentInputs>({
     resolver: zodResolver(createAppointmentSchema),
     defaultValues: {
@@ -77,7 +77,7 @@ export const CreateAppointmentTab = ({
       doctorAvatarUrl: "",
       date: "",
       time: "",
-      room: 0,
+      room: null,
       status: AppointmentStatus.Upcoming,
       documents: [],
     },
@@ -159,24 +159,32 @@ export const CreateAppointmentTab = ({
     );
   };
 
-  const submitAppointment = (data: CreateAppointmentInputs) => {
-    onSave({
-      patientId: user?.id ?? "00000000-0000-0000-0000-000000000000",
-      patientName: user?.userName || user?.email || "Unknown Patient",
-      patientAvatarUrl: user?.avatarUrl ?? null,
-      doctorId: data.doctorId,
-      doctorName: data.doctorName,
-      doctorSpecialty: data.doctorSpecialty,
-      doctorAvatarUrl: data.doctorAvatarUrl || null,
-      date: data.date,
-      time: data.time,
-      room: data.room,
-      status: data.status,
-      documents: data.documents.length > 0 ? data.documents : undefined,
-    });
+  const submitAppointment = async (data: CreateAppointmentInputs) => {
+    if (!user?.id) {
+      toast.error("User session not found. Please log in again.");
+      return;
+    }
 
-    reset();
-    onClose();
+    try {
+      await onSave({
+        patientId: user.id,
+        patientName: user.userName,
+        patientAvatarUrl: user?.avatarUrl ?? null,
+        doctorId: data.doctorId,
+        doctorName: data.doctorName,
+        doctorSpecialty: data.doctorSpecialty,
+        doctorAvatarUrl: data.doctorAvatarUrl || null,
+        date: data.date,
+        time: data.time,
+        room: data.room,
+        status: data.status,
+        documents: data.documents.length > 0 ? data.documents : undefined,
+      });
+
+      reset();
+      onClose();
+    } catch {
+    }
   };
 
   const handleModalClose = () => {
@@ -304,7 +312,6 @@ export const CreateAppointmentTab = ({
               </label>
               <input
                 readOnly
-                disabled
                 tabIndex={-1}
                 placeholder="Auto-filled"
                 className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed pointer-events-none select-none focus:outline-none"
@@ -323,10 +330,9 @@ export const CreateAppointmentTab = ({
               </label>
               <input
                 readOnly
-                disabled
                 tabIndex={-1}
                 type="text"
-                value={roomValue > 0 ? roomValue : ""}
+                value={roomValue && roomValue > 0 ? roomValue : ""}
                 placeholder="Auto-filled"
                 className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed pointer-events-none select-none focus:outline-none"
               />
@@ -455,7 +461,7 @@ export const CreateAppointmentTab = ({
               type="submit"
               className="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors cursor-pointer"
             >
-              Save Appointment
+              {isSubmitting ? "Saving..." : "Save Appointment"}
             </button>
           </div>
         </form>

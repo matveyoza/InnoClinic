@@ -7,6 +7,7 @@ import { Layout } from '../../Layouts/Layout';
 import { useUserStore } from '../../store/useUser';
 import type { Appointment } from '../../types/appointment';
 import { AppointmentStatus } from '../../types/enums/appointmentStatus';
+import toast from 'react-hot-toast';
 
 export const mainPageLoader = async (): Promise<Appointment[]> => {
   const response = await appointmentApi.get<Appointment[]>('');
@@ -34,16 +35,19 @@ export const MainPage = () => {
     setActionError(null);
     try {
       await appointmentApi.post('', newAppointment);
+      toast.success('Appointment created successfully');
       revalidator.revalidate();
-    } catch {
+    } catch (error) {
+      console.error('Failed to create appointment:', error);
       setActionError('Failed to create appointment.');
+      toast.error('Failed to create appointment.');
+      throw error;
     }
   };
 
   const upcomingCount = appointments.filter(
     (app) =>
-      app.status === AppointmentStatus.Upcoming ||
-      (app.status as unknown) === 0
+      app.status === AppointmentStatus.Upcoming
   ).length;
 
   const pageTitle = isAdmin

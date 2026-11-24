@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Entities/Entities.csproj" />
+  <Project Path="Repository/Repository.csproj" />
+  <Project Path="Service/Service.csproj" />
+  <Project Path="TimeSlotsService/TimeSlotsPresentation.csproj" />
+</Solution>

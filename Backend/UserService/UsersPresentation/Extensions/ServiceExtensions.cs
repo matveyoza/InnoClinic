@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service.Constants;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
 namespace Backend.Extensions

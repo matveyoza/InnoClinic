@@ -1,8 +1,8 @@
 export interface DoctorDto {
   id: string;
-  firstName: string | null;
-  lastName: string | null;
-  userName: string | null;
+  firstName: string;
+  lastName: string;
+  userName: string;
   email: string;
   specialty: string;
   roomNumber: number;

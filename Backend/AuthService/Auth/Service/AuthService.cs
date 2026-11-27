@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Service.Constants;
 using Service.Contracts;
-using Service.Shared;
+using Service.Shared.DataTransferObjects;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -46,10 +46,19 @@ public class AuthService : IAuthService
         }
 
         var assignedRole = string.IsNullOrWhiteSpace(registerDto.Role) ? "Patient" : registerDto.Role;
-        await _userManager.AddToRoleAsync(user, assignedRole);
+        var roleResult = await _userManager.AddToRoleAsync(user, assignedRole);
+
+        if (!roleResult.Succeeded)
+        {
+            await _userManager.DeleteAsync(user);
+            _logger.LogError("Failed to add role {Role} to user {Email}. Errors: {Errors}",
+                assignedRole, registerDto.Email, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+            return false;
+        }
 
         var profileDto = _mapper.Map<UserProfileCreationDto>(registerDto);
         profileDto.Id = user.Id;
+        profileDto.Role = assignedRole;
 
         var profileCreated = await CreateUserProfileAsync(profileDto);
 

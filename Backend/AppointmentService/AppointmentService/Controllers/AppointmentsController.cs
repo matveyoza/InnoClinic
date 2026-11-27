@@ -30,9 +30,9 @@ public class AppointmentsController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = $"{AppRoles.Patient},{AppRoles.Admin}")]
-    public async Task<IActionResult> CreateAppointment([FromBody] AppointmentForCreationDto request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateAppointment([FromBody] AppointmentForCreationDto appointmentDto, CancellationToken cancellationToken)
     {
-        var created = await _appointmentService.CreateAppointmentAsync(User.GetUserId(), User.GetRole(), User.GetUserName(), request, cancellationToken);
+        var created = await _appointmentService.CreateAppointmentAsync(User.GetUserId(), User.GetRole(), User.GetUserName(), appointmentDto, cancellationToken);
 
         return Created();
     }

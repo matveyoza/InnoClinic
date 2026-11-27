@@ -66,6 +66,14 @@ namespace UsersPresentation.Controllers
             return Ok(user);
         }
 
+        [HttpGet("doctors", Name = "GetDoctors")]
+        [Authorize(Roles = $"{AppRoles.Patient},{AppRoles.Admin}")]
+        public async Task<IActionResult> GetDoctors(CancellationToken cancellationToken)
+        {
+            var doctors = await _userService.GetDoctorsAsync(cancellationToken);
+            return Ok(doctors);
+        }
+
         [AllowAnonymous]
         [HttpPost("profile")]
         public async Task<IActionResult> CreateUserProfile([FromBody] UserProfileDto profileDto)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Shared
+namespace Service.Shared.DataTransferObjects
 {
     public sealed class TokenDto
     {

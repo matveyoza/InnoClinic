@@ -6,5 +6,6 @@ namespace Entities.Models
     {
         public string? FirstName { get; init; }
         public string? LastName { get; init; }
+        public DoctorProfile? DoctorProfile { get; set; }
     }
 }

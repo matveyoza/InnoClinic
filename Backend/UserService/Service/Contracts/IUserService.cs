@@ -9,5 +9,6 @@ namespace Service.Contracts
         Task<UserDto?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> CreateUserProfileAsync(UserProfileDto profileDto);
         Task<bool> DeleteUserAsync(Guid id);
+        Task<IEnumerable<UserDto>> GetDoctorsAsync(CancellationToken cancellationToken);
     }
 }

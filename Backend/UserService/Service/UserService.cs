@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Service.Contracts;
 using Service.Shared.DataTransferObjects;
+using Entities.Contracts;
 
 namespace Service
 {
@@ -15,12 +16,14 @@ namespace Service
         private readonly IMapper _mapper;
 
         private readonly ILogger<UserService> _logger;
+        private readonly IUserRepository _repository;
 
-        public UserService(UserManager<User> userManager, IMapper mapper, ILogger<UserService> logger)
+        public UserService(UserManager<User> userManager, IMapper mapper, ILogger<UserService> logger, IUserRepository repository)
         {
             _userManager = userManager;
             _mapper = mapper;
             _logger = logger;
+            _repository = repository;
         }
 
         public async Task<IEnumerable<UserDto>> GetUsersAsync(CancellationToken cancellationToken)
@@ -46,9 +49,25 @@ namespace Service
             return userDto;
         }
 
+        public async Task<IEnumerable<UserDto>> GetDoctorsAsync(CancellationToken cancellationToken)
+        {
+            var doctors = await _repository.GetDoctorsAsync(cancellationToken);
+
+            return _mapper.Map<IEnumerable<UserDto>>(doctors);
+        }
+
         public async Task<bool> CreateUserProfileAsync(UserProfileDto profileDto)
         {
             var user = _mapper.Map<User>(profileDto);
+
+            if (!string.IsNullOrWhiteSpace(profileDto.Specialty))
+            {
+                user.DoctorProfile = new DoctorProfile
+                {
+                    Specialty = profileDto.Specialty,
+                    RoomNumber = profileDto.RoomNumber ?? null
+                };
+            }
 
             var result = await _userManager.CreateAsync(user);
 
@@ -57,6 +76,15 @@ namespace Service
                 var errors = string.Join(", ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
                 _logger.LogError("Failed profile creation for ID {UserId}. Errors: {Errors}", user.Id, errors);
                 return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(profileDto.Role))
+            {
+                var roleResult = await _userManager.AddToRoleAsync(user, profileDto.Role);
+                if (!roleResult.Succeeded)
+                {
+                    _logger.LogWarning("Profile created, but failed to add role {Role} in UserService.", profileDto.Role);
+                }
             }
 
             return true;

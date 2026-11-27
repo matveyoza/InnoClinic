@@ -1,6 +1,6 @@
 ﻿using InnoClinic.Shared.Constants;
 
-namespace Service.Shared
+namespace Service.Shared.DataTransferObjects
 {
     public sealed record UserForRegistrationDto
     {
@@ -10,5 +10,7 @@ namespace Service.Shared
         public string? LastName { get; init; }
         public string? UserName { get; init; }
         public string Role { get; init; } = AppRoles.Patient;
+        public string? Specialty { get; init; }
+        public int? RoomNumber { get; init; }
     }
 }

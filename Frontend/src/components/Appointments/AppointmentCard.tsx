@@ -43,8 +43,8 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
         ?? guestAvatar;
 
     return (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex items-center gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-5 grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
+            <div className="flex items-center gap-4 min-w-0">
                 <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-lg shrink-0 overflow-hidden">
                     {avatarUrl ? (
                         <img
@@ -67,7 +67,7 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
                     )}
                     {isAdmin && (
                         <p className="text-slate-500 text-xs font-medium">
-                            Dr. {appointment.doctorName} • Patient: {appointment.patientName}
+                            {appointment.doctorName} • Patient: {appointment.patientName}
                         </p>
                     )}
 
@@ -78,7 +78,7 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
                 </div>
             </div>
 
-            <div className="flex items-center gap-3 bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
+            <div className="flex items-center gap-3 bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100 w-fit md:justify-self-center">
                 <div className="flex items-center gap-2">
                     <FaCalendarAlt className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <div className="text-left">
@@ -98,7 +98,7 @@ export const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
                 </div>
             </div>
 
-            <div className="flex flex-col md:items-end gap-2 w-full md:w-auto">
+            <div className="flex flex-col md:items-end md:justify-self-end gap-2 w-full md:w-auto">
                 <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold w-fit ${StatusBadge}`}>
                     {appointment.status}
                 </span>

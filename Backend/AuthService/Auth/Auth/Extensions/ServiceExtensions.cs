@@ -15,12 +15,10 @@ namespace AuthPresentation.Extensions
     {
         public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
         {
-            var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
-
             services.AddCors(options =>
             {
                 options.AddPolicy(AppConstants.CorsPolicy, builder =>
-                    builder.WithOrigins(allowedOrigins!)
+                    builder.WithOrigins(Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")!)
                     .WithMethods("GET", "POST", "PUT", "DELETE")
                     .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With")
                     .AllowCredentials());

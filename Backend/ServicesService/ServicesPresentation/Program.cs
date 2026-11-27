@@ -16,8 +16,8 @@ builder.Services.ConfigureCors(builder.Configuration);
 
 builder.Services.ConfigureSqlContext();
 
-builder.Services.AddScoped<IServicesRepository, ServicesRepository>();
-builder.Services.AddScoped<IServicesService, ServicesService>();
+builder.Services.ConfigureRepository();
+builder.Services.ConfigureService();
 
 builder.Services.AddControllers();
 

@@ -21,7 +21,7 @@ namespace Service
         {
             var segments = await _repository.GetByDoctorIdAsync(doctorId, date, cancellationToken);
 
-            return _mapper.Map<IEnumerable<BookedTimeSegmentDto>>(segments).OrderBy(s => s.Date).ThenBy(s => s.StartTime);
+            return _mapper.Map<IEnumerable<BookedTimeSegmentDto>>(segments);
         }
 
         public async Task<bool> BookTimeSegmentAsync(BookTimeSegmentDto dto, CancellationToken cancellationToken = default)
@@ -34,7 +34,7 @@ namespace Service
             var segment = _mapper.Map<BookedTimeSegment>(dto);
             segment.Id = Guid.NewGuid();
 
-            await _repository.AddAsync(segment, cancellationToken);
+            _repository.Add(segment);
             await _repository.SaveChangesAsync(cancellationToken);
 
             return true;

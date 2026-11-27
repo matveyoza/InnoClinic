@@ -16,13 +16,11 @@ namespace Repository
         {
             modelBuilder.Entity<BookedTimeSegment>(entity =>
             {
-                entity.HasKey(e => e.Id);
                 entity.HasIndex(e => new { e.DoctorId, e.Date });
             });
 
             modelBuilder.Entity<DoctorProfile>(entity =>
             {
-                entity.HasKey(e => e.Id);
                 entity.Property(e => e.Specialty).IsRequired().HasMaxLength(100);
             });
         }

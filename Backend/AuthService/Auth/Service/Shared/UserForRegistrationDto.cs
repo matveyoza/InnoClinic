@@ -1,4 +1,4 @@
-﻿using Service.Constants;
+﻿using InnoClinic.Shared.Constants;
 
 namespace Service.Shared
 {

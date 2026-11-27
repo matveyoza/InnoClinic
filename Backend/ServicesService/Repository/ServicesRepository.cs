@@ -33,8 +33,8 @@ namespace Repository
         public async Task<bool> HasOverlapAsync(Guid doctorId, DateOnly date, TimeOnly startTime, CancellationToken cancellationToken = default) =>
             await _context.BookedTimeSegments.AnyAsync(s => s.DoctorId == doctorId && s.Date == date, cancellationToken);
 
-        public async Task AddAsync(BookedTimeSegment segment, CancellationToken cancellationToken = default) =>
-            await _context.BookedTimeSegments.AddAsync(segment, cancellationToken);
+        public void Add(BookedTimeSegment segment) =>
+            _context.BookedTimeSegments.Add(segment);
 
         public async Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
             await _context.SaveChangesAsync(cancellationToken);

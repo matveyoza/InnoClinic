@@ -1,10 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Repository;
-using Service.Constants;
-using System.IdentityModel.Tokens.Jwt;
+﻿using Entities.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Repository;
+using Service;
+using Service.Constants;
+using Service.Contracts;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace ServicesPresentation.Extensions
 {
@@ -14,7 +17,7 @@ namespace ServicesPresentation.Extensions
             services.AddCors(options =>
             {
                 options.AddPolicy(AppConstants.CorsPolicy, builder =>
-                    builder.WithOrigins("https://localhost:5173")
+                    builder.WithOrigins(Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")!)
                     .WithMethods("GET", "POST", "PUT", "DELETE")
                     .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With")
                     .AllowCredentials());
@@ -26,6 +29,10 @@ namespace ServicesPresentation.Extensions
                 opts.UseSqlServer(connectionString));
         }
 
+        public static IServiceCollection ConfigureService(this IServiceCollection services) =>
+            services.AddScoped<IServicesRepository, ServicesRepository>();
+        public static IServiceCollection ConfigureRepository(this IServiceCollection services) =>
+            services.AddScoped<IServicesService, ServicesService>();
         public static void ConfigureJwt(this IServiceCollection services)
         {
             var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");

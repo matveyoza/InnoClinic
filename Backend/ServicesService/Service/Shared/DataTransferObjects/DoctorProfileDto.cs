@@ -6,6 +6,6 @@
         public string UserId { get; init; } = string.Empty;
         public string Specialty { get; init; } = string.Empty;
         public int RoomNumber { get; init; }
-        public int Duration { get; init; }
+        public int AppointmentDuration { get; init; }
     }
 }

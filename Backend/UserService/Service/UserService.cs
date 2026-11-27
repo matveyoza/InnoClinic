@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Entities.Models;
-using Entities.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

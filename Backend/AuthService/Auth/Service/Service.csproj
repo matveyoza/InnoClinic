@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\InnoClinic.Shared\InnoClinic.Shared.csproj" />
     <ProjectReference Include="..\Entities\Entities.csproj" />
   </ItemGroup>
 

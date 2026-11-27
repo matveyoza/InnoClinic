@@ -6,13 +6,24 @@ using Repository;
 using Service;
 using Service.Contracts;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using Service.Constants;
 using System.Text;
 
 namespace AppointmentPresentation.Extensions
 {
     public static class ServiceExtensions
     {
+        public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(AppConstants.CorsPolicy, builder =>
+                    builder.WithOrigins(Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")!)
+                    .WithMethods("GET", "POST", "PUT", "DELETE")
+                    .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With")
+                    .AllowCredentials());
+            });
+        }
         public static void ConfigureSqlContext(this IServiceCollection services)
         {
             var connectionString = Environment.GetEnvironmentVariable("USER_DB_CONNECTION");

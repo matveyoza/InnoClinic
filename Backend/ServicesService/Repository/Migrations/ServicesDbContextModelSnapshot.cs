@@ -50,7 +50,7 @@ namespace Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Duration")
+                    b.Property<int>("AppointmentDuration")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomNumber")

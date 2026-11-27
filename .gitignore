@@ -51,3 +51,5 @@ obj/
 **/wwwroot/images/
 **/public/images/
 **/uploads/
+
+**/appsettings.Development.json

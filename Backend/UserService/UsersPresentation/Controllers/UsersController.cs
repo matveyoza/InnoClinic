@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
-using Service.Shared.Constants;
+using InnoClinic.Shared.Constants;
 using Service.Shared.DataTransferObjects;
-using System.Security.Claims;
 
 namespace UsersPresentation.Controllers
 {

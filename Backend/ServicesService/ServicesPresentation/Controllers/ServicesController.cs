@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
-using Service.Shared.Constants;
 using Service.Shared.DataTransferObjects;
+using InnoClinic.Shared.Constants;
 
 namespace ServicesPresentation.Controllers
 {

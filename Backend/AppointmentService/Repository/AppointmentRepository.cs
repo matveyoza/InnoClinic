@@ -1,7 +1,7 @@
 ﻿using Entities.Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
-using Service.Shared.Constants;
+using InnoClinic.Shared.Constants;
 
 namespace Repository
 {

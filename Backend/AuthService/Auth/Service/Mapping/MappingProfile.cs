@@ -1,6 +1,6 @@
 ﻿using Entities.Models;
-using Service.Shared;
 using AutoMapper;
+using Service.Shared.DataTransferObjects;
 
 namespace Service.Mapping
 {

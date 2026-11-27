@@ -1,8 +1,6 @@
 using Backend.Extensions;
 using DotNetEnv;
-using Service;
 using Service.Constants;
-using Service.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +14,8 @@ builder.Services.ConfigureCors(builder.Configuration);
 
 builder.Services.ConfigureSqlContext();
 
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.ConfigureRepository();
+builder.Services.ConfigureService();
 
 builder.Services.AddControllers();
 

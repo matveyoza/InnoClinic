@@ -1,12 +1,15 @@
-﻿using Entities.Models;
+﻿using Entities.Contracts;
+using Entities.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
+using Repository.Persistence;
+using Service;
 using Service.Constants;
+using Service.Contracts;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
 namespace Backend.Extensions
@@ -29,6 +32,12 @@ namespace Backend.Extensions
             services.AddDbContext<UserDbContext>(opts =>
                 opts.UseSqlServer(connectionString));
         }
+
+        public static IServiceCollection ConfigureRepository(this IServiceCollection services) =>
+           services.AddScoped<IUserRepository, UserRepository>();
+
+        public static IServiceCollection ConfigureService(this IServiceCollection services) =>
+           services.AddScoped<IUserService, UserService>();
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {

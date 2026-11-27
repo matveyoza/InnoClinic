@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Service.Shared;
+using Service.Shared.DataTransferObjects;
 
 namespace Service.Validators
 {

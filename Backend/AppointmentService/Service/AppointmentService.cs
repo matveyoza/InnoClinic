@@ -2,8 +2,8 @@
 using Entities.Contracts;
 using Entities.Models;
 using Service.Contracts;
-using Service.Shared.Constants;
 using Service.Shared.DataTransferObjects;
+using InnoClinic.Shared.Constants;
 
 namespace Service;
 

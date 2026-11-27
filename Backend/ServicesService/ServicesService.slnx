@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="../InnoClinic.Shared/InnoClinic.Shared.csproj" Id="f0a4c1af-81de-41d9-a1c6-1f3d0cb9e91c" />
+  <Project Path="Entities/Entities.csproj" />
+  <Project Path="Repository/Repository.csproj" />
+  <Project Path="Service/Service.csproj" />
+  <Project Path="ServicesPresentation/ServicesPresentation.csproj" />
+</Solution>
